@@ -24,8 +24,9 @@ namespace HandGestureRecognition
         AdaptiveSkinDetector detector;
         
         int frameWidth;
-        int frameHeight; 
+        int frameHeight;
         private short[] pixelData;
+        private short[] pixelDataLast;
         private byte[] depthFrame32; 
         
         Hsv hsv_min;
@@ -77,28 +78,36 @@ namespace HandGestureRecognition
                         pixelData = new short[imageFrame.PixelDataLength];
                         depthFrame32 = new byte[frameWidth * frameHeight * 4];
                         currentFrame = new Image<Gray, Int16>(frameWidth, frameHeight, new Gray(0.9));
+                        pixelDataLast = new short[imageFrame.PixelDataLength];
                     }
                     imageFrame.CopyPixelDataTo(this.pixelData);
                     short[,,] frameData = currentFrame.Data;
                     int pLength = imageFrame.PixelDataLength;
-                    int closest = 0xFFFF;
+                    int closest = 32767;
 
                     for (int i = 0; i < pLength; i++)
                     {
                         int thisX = (int)(i % frameWidth);
                         int thisY = (int)(i / frameWidth);
-                        int d = pixelData[i];
-                        int temp = d - last_top;
-                        if (temp > 0xFFFF || temp <= 0)
-                            temp = 0xFFFF;
-                        temp = ~temp;
+                        short d = pixelData[i];
+                        int temp;
+                        if (d <= 0)
+                            temp = 32767;
+                        else
+                            temp = pixelData[i] - pixelDataLast[i];
+                        if (d <= 0 || pixelData[i]+100 > pixelDataLast[i] || d > 10000)
+                            temp = 0;
+                        else
+                            temp = 32767;
 
                         frameData[thisY, thisX, 0] = (short)temp;
 
-                        if (d < closest)
+                        if (d < closest && d > 0)
                             closest = d;
                     }
                     last_top = closest;
+                    pixelDataLast = (short[]) pixelData.Clone();
+                    dataOutput.Text = last_top.ToString();
 
                     /*
                     currentFrameCopy = currentFrame.Copy();

@@ -68,3 +68,21 @@ C:\Users\Ray\Dropbox\Capstone\HandGestureRecognition bw\HandGestureRecognition\H
 C:\Users\Ray\Dropbox\Capstone\HandGestureRecognition bw\HandGestureRecognition\HandGestureRecognition\HandGestureRecognition\obj\x86\Debug\ResGen.read.1.tlog
 C:\Users\Ray\Dropbox\Capstone\HandGestureRecognition bw\HandGestureRecognition\HandGestureRecognition\HandGestureRecognition\obj\x86\Debug\GenerateResource.write.1.tlog
 C:\Users\Ray\Dropbox\Capstone\HandGestureRecognition bw\HandGestureRecognition\HandGestureRecognition\HandGestureRecognition\obj\x86\Debug\ResGen.write.1.tlog
+C:\Users\Ray\Dropbox\fingertracking\HandGestureRecognition\bin\Debug\HandGestureRecognition.exe.config
+C:\Users\Ray\Dropbox\fingertracking\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.exe
+C:\Users\Ray\Dropbox\fingertracking\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.pdb
+C:\Users\Ray\Dropbox\fingertracking\HandGestureRecognition\bin\Debug\cvextern.dll
+C:\Users\Ray\Dropbox\fingertracking\HandGestureRecognition\bin\Debug\HandGestureRecognition.exe
+C:\Users\Ray\Dropbox\fingertracking\HandGestureRecognition\bin\Debug\HandGestureRecognition.pdb
+C:\Users\Ray\Dropbox\fingertracking\HandGestureRecognition\bin\Debug\Emgu.CV.dll
+C:\Users\Ray\Dropbox\fingertracking\HandGestureRecognition\bin\Debug\Emgu.CV.UI.dll
+C:\Users\Ray\Dropbox\fingertracking\HandGestureRecognition\bin\Debug\Emgu.Util.dll
+C:\Users\Ray\Dropbox\fingertracking\HandGestureRecognition\bin\Debug\HandGestureRecognition.SkinDetector.dll
+C:\Users\Ray\Dropbox\fingertracking\HandGestureRecognition\bin\Debug\HandGestureRecognition.SkinDetector.pdb
+C:\Users\Ray\Dropbox\fingertracking\HandGestureRecognition\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Ray\Dropbox\fingertracking\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.Form1.resources
+C:\Users\Ray\Dropbox\fingertracking\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.Properties.Resources.resources
+C:\Users\Ray\Dropbox\fingertracking\HandGestureRecognition\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\Ray\Dropbox\fingertracking\HandGestureRecognition\obj\x86\Debug\ResGen.read.1.tlog
+C:\Users\Ray\Dropbox\fingertracking\HandGestureRecognition\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\Ray\Dropbox\fingertracking\HandGestureRecognition\obj\x86\Debug\ResGen.write.1.tlog

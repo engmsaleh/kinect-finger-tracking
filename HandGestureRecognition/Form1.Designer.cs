@@ -29,74 +29,46 @@
         private void InitializeComponent()
         {
             this.imageBoxFrameGrabber = new Emgu.CV.UI.ImageBox();
-            this.splitContainerFrames = new System.Windows.Forms.SplitContainer();
-            this.imageBoxSkin = new Emgu.CV.UI.ImageBox();
+            this.dataOutput = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.imageBoxFrameGrabber)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainerFrames)).BeginInit();
-            this.splitContainerFrames.Panel1.SuspendLayout();
-            this.splitContainerFrames.Panel2.SuspendLayout();
-            this.splitContainerFrames.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.imageBoxSkin)).BeginInit();
             this.SuspendLayout();
             // 
             // imageBoxFrameGrabber
             // 
-            this.imageBoxFrameGrabber.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.imageBoxFrameGrabber.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.imageBoxFrameGrabber.Location = new System.Drawing.Point(0, 0);
             this.imageBoxFrameGrabber.Name = "imageBoxFrameGrabber";
-            this.imageBoxFrameGrabber.Size = new System.Drawing.Size(607, 391);
-            this.imageBoxFrameGrabber.TabIndex = 2;
+            this.imageBoxFrameGrabber.Size = new System.Drawing.Size(485, 391);
+            this.imageBoxFrameGrabber.TabIndex = 3;
             this.imageBoxFrameGrabber.TabStop = false;
             // 
-            // splitContainerFrames
+            // dataOutput
             // 
-            this.splitContainerFrames.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainerFrames.Location = new System.Drawing.Point(0, 0);
-            this.splitContainerFrames.Name = "splitContainerFrames";
-            // 
-            // splitContainerFrames.Panel1
-            // 
-            this.splitContainerFrames.Panel1.Controls.Add(this.imageBoxFrameGrabber);
-            // 
-            // splitContainerFrames.Panel2
-            // 
-            this.splitContainerFrames.Panel2.Controls.Add(this.imageBoxSkin);
-            this.splitContainerFrames.Size = new System.Drawing.Size(1285, 391);
-            this.splitContainerFrames.SplitterDistance = 607;
-            this.splitContainerFrames.TabIndex = 3;
-            // 
-            // imageBoxSkin
-            // 
-            this.imageBoxSkin.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.imageBoxSkin.Location = new System.Drawing.Point(0, 0);
-            this.imageBoxSkin.Name = "imageBoxSkin";
-            this.imageBoxSkin.Size = new System.Drawing.Size(674, 391);
-            this.imageBoxSkin.TabIndex = 2;
-            this.imageBoxSkin.TabStop = false;
+            this.dataOutput.Location = new System.Drawing.Point(538, 12);
+            this.dataOutput.Name = "dataOutput";
+            this.dataOutput.Size = new System.Drawing.Size(100, 20);
+            this.dataOutput.TabIndex = 4;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1285, 391);
-            this.Controls.Add(this.splitContainerFrames);
+            this.ClientSize = new System.Drawing.Size(650, 391);
+            this.Controls.Add(this.dataOutput);
+            this.Controls.Add(this.imageBoxFrameGrabber);
             this.Name = "Form1";
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.imageBoxFrameGrabber)).EndInit();
-            this.splitContainerFrames.Panel1.ResumeLayout(false);
-            this.splitContainerFrames.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainerFrames)).EndInit();
-            this.splitContainerFrames.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.imageBoxSkin)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
         private Emgu.CV.UI.ImageBox imageBoxFrameGrabber;
-        private System.Windows.Forms.SplitContainer splitContainerFrames;
-        private Emgu.CV.UI.ImageBox imageBoxSkin;
+        private System.Windows.Forms.TextBox dataOutput;
+
     }
 }
 
