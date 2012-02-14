@@ -19,3 +19,10 @@ C:\Users\Ray\Dropbox\fingertracking\HandGestureRecognition.SkinDetector\bin\Debu
 C:\Users\Ray\Dropbox\fingertracking\HandGestureRecognition.SkinDetector\obj\Debug\ResolveAssemblyReference.cache
 C:\Users\Ray\Dropbox\fingertracking\HandGestureRecognition.SkinDetector\obj\Debug\HandGestureRecognition.SkinDetector.dll
 C:\Users\Ray\Dropbox\fingertracking\HandGestureRecognition.SkinDetector\obj\Debug\HandGestureRecognition.SkinDetector.pdb
+C:\Users\Phillip\Desktop\Nontic\HandGestureRecognition.SkinDetector\bin\Debug\HandGestureRecognition.SkinDetector.dll
+C:\Users\Phillip\Desktop\Nontic\HandGestureRecognition.SkinDetector\bin\Debug\HandGestureRecognition.SkinDetector.pdb
+C:\Users\Phillip\Desktop\Nontic\HandGestureRecognition.SkinDetector\bin\Debug\Emgu.CV.dll
+C:\Users\Phillip\Desktop\Nontic\HandGestureRecognition.SkinDetector\bin\Debug\Emgu.Util.dll
+C:\Users\Phillip\Desktop\Nontic\HandGestureRecognition.SkinDetector\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Phillip\Desktop\Nontic\HandGestureRecognition.SkinDetector\obj\Debug\HandGestureRecognition.SkinDetector.dll
+C:\Users\Phillip\Desktop\Nontic\HandGestureRecognition.SkinDetector\obj\Debug\HandGestureRecognition.SkinDetector.pdb

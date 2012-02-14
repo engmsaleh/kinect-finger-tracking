@@ -20,21 +20,21 @@ namespace HandGestureRecognition
 
         Image<Gray, Int16> currentFrame;
         Image<Gray, Int16> currentFrameCopy;
-                
+
         AdaptiveSkinDetector detector;
-        
+
         int frameWidth;
         int frameHeight;
         private short[] pixelData;
         private short[] pixelDataLast;
-        private byte[] depthFrame32; 
-        
+        private byte[] depthFrame32;
+
         Hsv hsv_min;
         Hsv hsv_max;
         Ycc YCrCb_min;
         Ycc YCrCb_max;
         int last_top;
-        
+
         Seq<Point> hull;
         Seq<Point> filteredHull;
         Seq<MCvConvexityDefect> defects;
@@ -43,19 +43,20 @@ namespace HandGestureRecognition
         MCvBox2D box;
         Ellipse ellip;
         KinectSensor kinectSensor;
-        
+
+        Int32 max;
         public Form1()
         {
-            InitializeComponent();     
+            InitializeComponent();
             detector = new AdaptiveSkinDetector(1, AdaptiveSkinDetector.MorphingMethod.NONE);
-            hsv_min = new Hsv(0, 45, 0); 
-            hsv_max = new Hsv(20, 255, 255);            
+            hsv_min = new Hsv(0, 45, 0);
+            hsv_max = new Hsv(20, 255, 255);
             YCrCb_min = new Ycc(0, 131, 80);
             YCrCb_max = new Ycc(255, 185, 135);
             box = new MCvBox2D();
             ellip = new Ellipse();
             last_top = 0;
-
+            max = Int32.MaxValue;
             // show status for each sensor that is found now.
             foreach (KinectSensor kinect in KinectSensor.KinectSensors)
             {
@@ -81,7 +82,7 @@ namespace HandGestureRecognition
                         pixelDataLast = new short[imageFrame.PixelDataLength];
                     }
                     imageFrame.CopyPixelDataTo(this.pixelData);
-                    short[,,] frameData = currentFrame.Data;
+                    short[, ,] frameData = currentFrame.Data;
                     int pLength = imageFrame.PixelDataLength;
                     int closest = 32767;
 
@@ -90,12 +91,13 @@ namespace HandGestureRecognition
                         int thisX = (int)(i % frameWidth);
                         int thisY = (int)(i / frameWidth);
                         short d = pixelData[i];
-                        int temp;
-                        if (d <= 0)
+                        int temp = pixelData[i] - pixelDataLast[i];
+                        /*if (d <= 0)
                             temp = 32767;
                         else
                             temp = pixelData[i] - pixelDataLast[i];
-                        if (d <= 0 || pixelData[i]+100 > pixelDataLast[i] || d > 10000)
+                         * */
+                        if (d <= 0 || Math.Abs(temp) < 100 || d > 10000)
                             temp = 0;
                         else
                             temp = 32767;
@@ -106,36 +108,32 @@ namespace HandGestureRecognition
                             closest = d;
                     }
                     last_top = closest;
-                    pixelDataLast = (short[]) pixelData.Clone();
+                    pixelDataLast = (short[])pixelData.Clone();
                     dataOutput.Text = last_top.ToString();
 
-                    /*
-                    currentFrameCopy = currentFrame.Copy();
+
+                    //currentFrameCopy = currentFrame.Copy();
 
                     // Uncomment if using opencv adaptive skin detector
                     //Image<Gray,Byte> skin = new Image<Gray,byte>(currentFrameCopy.Width,currentFrameCopy.Height);                
                     //detector.Process(currentFrameCopy, skin);                
 
-                    skinDetector = new YCrCbSkinDetector();
+                    //skinDetector = new YCrCbSkinDetector();
 
-                    Image<Gray, Byte> skin = skinDetector.DetectSkin(currentFrameCopy, YCrCb_min, YCrCb_max);
+                    //Image<Gray, Byte> skin = skinDetector.DetectSkin(currentFrameCopy, YCrCb_min, YCrCb_max);
+                    Image<Gray, byte> temppp = currentFrame.Convert<byte>(delegate(short b) {return (byte) (b >> 8);});
 
-                    ExtractContourAndHull(skin);
-
+                    ExtractContourAndHull(temppp);
                     DrawAndComputeFingersNum();
-
-                    imageBoxSkin.Image = skin;*/
                     imageBoxFrameGrabber.Image = currentFrame;
                 }
             }
         }
-               /*
-        private void ExtractContourAndHull(Image<Gray, byte> skin)
+        private void ExtractContourAndHull(Image<Gray, byte> input)
         {
             using (MemStorage storage = new MemStorage())
             {
-
-                Contour<Point> contours = skin.FindContours(Emgu.CV.CvEnum.CHAIN_APPROX_METHOD.CV_CHAIN_APPROX_SIMPLE, Emgu.CV.CvEnum.RETR_TYPE.CV_RETR_LIST, storage);
+                Contour<Point> contours = input.FindContours(Emgu.CV.CvEnum.CHAIN_APPROX_METHOD.CV_CHAIN_APPROX_SIMPLE, Emgu.CV.CvEnum.RETR_TYPE.CV_RETR_LIST, storage);
                 Contour<Point> biggestContour = null;
 
                 Double Result1 = 0;
@@ -155,9 +153,9 @@ namespace HandGestureRecognition
                 {
                     //currentFrame.Draw(biggestContour, new Bgr(Color.DarkViolet), 2);
                     Contour<Point> currentContour = biggestContour.ApproxPoly(biggestContour.Perimeter * 0.0025, storage);
-                    currentFrame.Draw(currentContour, new Bgr(Color.LimeGreen), 2);
+                    currentFrame.Draw(currentContour, new Gray(max), 2);
                     biggestContour = currentContour;
-                
+
 
                     hull = biggestContour.GetConvexHull(Emgu.CV.CvEnum.ORIENTATION.CV_CLOCKWISE);
                     box = biggestContour.GetMinAreaRect();
@@ -169,8 +167,8 @@ namespace HandGestureRecognition
                     for (int i = 0; i < points.Length; i++)
                         ps[i] = new Point((int)points[i].X, (int)points[i].Y);
 
-                    currentFrame.DrawPolyline(hull.ToArray(), true, new Bgr(200, 125, 75), 2);
-                    currentFrame.Draw(new CircleF(new PointF(box.center.X, box.center.Y), 3), new Bgr(200, 125, 75), 2);
+                    currentFrame.DrawPolyline(hull.ToArray(), true, new Gray(max), 2);
+                    currentFrame.Draw(new CircleF(new PointF(box.center.X, box.center.Y), 3), new Gray(max), 2);
 
                     //ellip.MCvBox2D= CvInvoke.cvFitEllipse2(biggestContour.Ptr);
                     //currentFrame.Draw(new Ellipse(ellip.MCvBox2D), new Bgr(Color.LavenderBlush), 3);
@@ -218,45 +216,47 @@ namespace HandGestureRecognition
             #endregion
 
             #region defects drawing
-            for (int i = 0; i < defects.Total; i++)
+            if (defects != null)
             {
-                PointF startPoint = new PointF((float)defectArray[i].StartPoint.X,
-                                                (float)defectArray[i].StartPoint.Y);
-
-                PointF depthPoint = new PointF((float)defectArray[i].DepthPoint.X,
-                                                (float)defectArray[i].DepthPoint.Y);
-
-                PointF endPoint = new PointF((float)defectArray[i].EndPoint.X,
-                                                (float)defectArray[i].EndPoint.Y);
-
-                LineSegment2D startDepthLine = new LineSegment2D(defectArray[i].StartPoint, defectArray[i].DepthPoint);
-
-                LineSegment2D depthEndLine = new LineSegment2D(defectArray[i].DepthPoint, defectArray[i].EndPoint);
-
-                CircleF startCircle = new CircleF(startPoint, 5f);
-
-                CircleF depthCircle = new CircleF(depthPoint, 5f);
-
-                CircleF endCircle = new CircleF(endPoint, 5f);
-
-                //Custom heuristic based on some experiment, double check it before use
-                if ((startCircle.Center.Y < box.center.Y || depthCircle.Center.Y < box.center.Y) && (startCircle.Center.Y < depthCircle.Center.Y) && (Math.Sqrt(Math.Pow(startCircle.Center.X - depthCircle.Center.X, 2) + Math.Pow(startCircle.Center.Y - depthCircle.Center.Y, 2)) > box.size.Height / 6.5))
+                for (int i = 0; i < defects.Total; i++)
                 {
-                    fingerNum++;
-                    currentFrame.Draw(startDepthLine, new Bgr(Color.Green), 2);
-                    //currentFrame.Draw(depthEndLine, new Bgr(Color.Magenta), 2);
-                }
+                    PointF startPoint = new PointF((float)defectArray[i].StartPoint.X,
+                                                    (float)defectArray[i].StartPoint.Y);
 
-                                
-                currentFrame.Draw(startCircle, new Bgr(Color.Red), 2);
-                currentFrame.Draw(depthCircle, new Bgr(Color.Yellow), 5);
-                //currentFrame.Draw(endCircle, new Bgr(Color.DarkBlue), 4);
+                    PointF depthPoint = new PointF((float)defectArray[i].DepthPoint.X,
+                                                    (float)defectArray[i].DepthPoint.Y);
+
+                    PointF endPoint = new PointF((float)defectArray[i].EndPoint.X,
+                                                    (float)defectArray[i].EndPoint.Y);
+
+                    LineSegment2D startDepthLine = new LineSegment2D(defectArray[i].StartPoint, defectArray[i].DepthPoint);
+
+                    LineSegment2D depthEndLine = new LineSegment2D(defectArray[i].DepthPoint, defectArray[i].EndPoint);
+
+                    CircleF startCircle = new CircleF(startPoint, 5f);
+
+                    CircleF depthCircle = new CircleF(depthPoint, 5f);
+
+                    CircleF endCircle = new CircleF(endPoint, 5f);
+
+                    //Custom heuristic based on some experiment, double check it before use
+                    if ((startCircle.Center.Y < box.center.Y || depthCircle.Center.Y < box.center.Y) && (startCircle.Center.Y < depthCircle.Center.Y) && (Math.Sqrt(Math.Pow(startCircle.Center.X - depthCircle.Center.X, 2) + Math.Pow(startCircle.Center.Y - depthCircle.Center.Y, 2)) > box.size.Height / 6.5))
+                    {
+                        fingerNum++;
+                        currentFrame.Draw(startDepthLine, new Gray(max), 2);
+                        //currentFrame.Draw(depthEndLine, new Bgr(Color.Magenta), 2);
+                    }
+
+
+                    currentFrame.Draw(startCircle, new Gray(max), 2);
+                    currentFrame.Draw(depthCircle, new Gray(max), 5);
+                    //currentFrame.Draw(endCircle, new Bgr(Color.DarkBlue), 4);
+                }
             }
             #endregion
 
             MCvFont font = new MCvFont(Emgu.CV.CvEnum.FONT.CV_FONT_HERSHEY_DUPLEX, 5d, 5d);
-            currentFrame.Draw(fingerNum.ToString(), ref font, new Point(50, 150), new Bgr(Color.White));
-        }*/
-                                      
+            currentFrame.Draw(fingerNum.ToString(), ref font, new Point(50, 150), new Gray(max));
+        }
     }
 }
