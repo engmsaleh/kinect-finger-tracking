@@ -21,18 +21,11 @@ namespace HandGestureRecognition
         Image<Gray, Int16> currentFrame;
         Image<Gray, Int16> currentFrameCopy;
 
-        AdaptiveSkinDetector detector;
-
         int frameWidth;
         int frameHeight;
         private short[] pixelData;
         private short[] pixelDataLast;
         private byte[] depthFrame32;
-
-        Hsv hsv_min;
-        Hsv hsv_max;
-        Ycc YCrCb_min;
-        Ycc YCrCb_max;
         int last_top;
 
         Seq<Point> hull;
@@ -44,19 +37,16 @@ namespace HandGestureRecognition
         Ellipse ellip;
         KinectSensor kinectSensor;
 
-        Int32 max;
+        Int32 MAX_INT32;
+        Int32 MAX_INT16;
         public Form1()
         {
             InitializeComponent();
-            detector = new AdaptiveSkinDetector(1, AdaptiveSkinDetector.MorphingMethod.NONE);
-            hsv_min = new Hsv(0, 45, 0);
-            hsv_max = new Hsv(20, 255, 255);
-            YCrCb_min = new Ycc(0, 131, 80);
-            YCrCb_max = new Ycc(255, 185, 135);
             box = new MCvBox2D();
             ellip = new Ellipse();
             last_top = 0;
-            max = Int32.MaxValue;
+            MAX_INT32 = Int32.MaxValue;
+            MAX_INT16 = Int16.MaxValue;
             // show status for each sensor that is found now.
             foreach (KinectSensor kinect in KinectSensor.KinectSensors)
             {
@@ -93,14 +83,14 @@ namespace HandGestureRecognition
                         short d = pixelData[i];
                         int temp = pixelData[i] - pixelDataLast[i];
                         /*if (d <= 0)
-                            temp = 32767;
+                            temp = MAX_INT16;
                         else
                             temp = pixelData[i] - pixelDataLast[i];
                          * */
                         if (d <= 0 || Math.Abs(temp) < 100 || d > 10000)
                             temp = 0;
                         else
-                            temp = 32767;
+                            temp = MAX_INT16;
 
                         frameData[thisY, thisX, 0] = (short)temp;
 
@@ -153,7 +143,7 @@ namespace HandGestureRecognition
                 {
                     //currentFrame.Draw(biggestContour, new Bgr(Color.DarkViolet), 2);
                     Contour<Point> currentContour = biggestContour.ApproxPoly(biggestContour.Perimeter * 0.0025, storage);
-                    currentFrame.Draw(currentContour, new Gray(max), 2);
+                    currentFrame.Draw(currentContour, new Gray(MAX_INT32), 2);
                     biggestContour = currentContour;
 
 
@@ -167,14 +157,12 @@ namespace HandGestureRecognition
                     for (int i = 0; i < points.Length; i++)
                         ps[i] = new Point((int)points[i].X, (int)points[i].Y);
 
-                    currentFrame.DrawPolyline(hull.ToArray(), true, new Gray(max), 2);
-                    currentFrame.Draw(new CircleF(new PointF(box.center.X, box.center.Y), 3), new Gray(max), 2);
+                    currentFrame.DrawPolyline(hull.ToArray(), true, new Gray(MAX_INT32), 2);
+                    currentFrame.Draw(new CircleF(new PointF(box.center.X, box.center.Y), 3), new Gray(MAX_INT32), 2);
 
                     //ellip.MCvBox2D= CvInvoke.cvFitEllipse2(biggestContour.Ptr);
                     //currentFrame.Draw(new Ellipse(ellip.MCvBox2D), new Bgr(Color.LavenderBlush), 3);
 
-                    PointF center;
-                    float radius;
                     //CvInvoke.cvMinEnclosingCircle(biggestContour.Ptr, out  center, out  radius);
                     //currentFrame.Draw(new CircleF(center, radius), new Bgr(Color.Gold), 2);
 
@@ -243,20 +231,20 @@ namespace HandGestureRecognition
                     if ((startCircle.Center.Y < box.center.Y || depthCircle.Center.Y < box.center.Y) && (startCircle.Center.Y < depthCircle.Center.Y) && (Math.Sqrt(Math.Pow(startCircle.Center.X - depthCircle.Center.X, 2) + Math.Pow(startCircle.Center.Y - depthCircle.Center.Y, 2)) > box.size.Height / 6.5))
                     {
                         fingerNum++;
-                        currentFrame.Draw(startDepthLine, new Gray(max), 2);
+                        currentFrame.Draw(startDepthLine, new Gray(MAX_INT32), 2);
                         //currentFrame.Draw(depthEndLine, new Bgr(Color.Magenta), 2);
                     }
 
 
-                    currentFrame.Draw(startCircle, new Gray(max), 2);
-                    currentFrame.Draw(depthCircle, new Gray(max), 5);
+                    currentFrame.Draw(startCircle, new Gray(MAX_INT32), 2);
+                    currentFrame.Draw(depthCircle, new Gray(MAX_INT32), 5);
                     //currentFrame.Draw(endCircle, new Bgr(Color.DarkBlue), 4);
                 }
             }
             #endregion
 
             MCvFont font = new MCvFont(Emgu.CV.CvEnum.FONT.CV_FONT_HERSHEY_DUPLEX, 5d, 5d);
-            currentFrame.Draw(fingerNum.ToString(), ref font, new Point(50, 150), new Gray(max));
+            currentFrame.Draw(fingerNum.ToString(), ref font, new Point(50, 150), new Gray(MAX_INT32));
         }
     }
 }
