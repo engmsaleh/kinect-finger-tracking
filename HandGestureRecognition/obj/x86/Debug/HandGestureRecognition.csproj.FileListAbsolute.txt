@@ -122,3 +122,39 @@ C:\Users\Ray\Desktop\ft\HandGestureRecognition\obj\x86\Debug\GenerateResource.re
 C:\Users\Ray\Desktop\ft\HandGestureRecognition\obj\x86\Debug\ResGen.read.1.tlog
 C:\Users\Ray\Desktop\ft\HandGestureRecognition\obj\x86\Debug\GenerateResource.write.1.tlog
 C:\Users\Ray\Desktop\ft\HandGestureRecognition\obj\x86\Debug\ResGen.write.1.tlog
+C:\Nontic\HandGestureRecognition\bin\Debug\HandGestureRecognition.exe.config
+C:\Nontic\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.exe
+C:\Nontic\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.pdb
+C:\Nontic\HandGestureRecognition\bin\Debug\cvextern.dll
+C:\Nontic\HandGestureRecognition\bin\Debug\HandGestureRecognition.exe
+C:\Nontic\HandGestureRecognition\bin\Debug\HandGestureRecognition.pdb
+C:\Nontic\HandGestureRecognition\bin\Debug\Emgu.CV.dll
+C:\Nontic\HandGestureRecognition\bin\Debug\Emgu.CV.UI.dll
+C:\Nontic\HandGestureRecognition\bin\Debug\Emgu.Util.dll
+C:\Nontic\HandGestureRecognition\bin\Debug\HandGestureRecognition.SkinDetector.dll
+C:\Nontic\HandGestureRecognition\bin\Debug\HandGestureRecognition.SkinDetector.pdb
+C:\Nontic\HandGestureRecognition\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Nontic\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.Form1.resources
+C:\Nontic\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.Properties.Resources.resources
+C:\Nontic\HandGestureRecognition\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Nontic\HandGestureRecognition\obj\x86\Debug\ResGen.read.1.tlog
+C:\Nontic\HandGestureRecognition\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Nontic\HandGestureRecognition\obj\x86\Debug\ResGen.write.1.tlog
+C:\Users\Eddie\Dropbox\Capstone\Nontic TableDiff\Nontic TableDiff\HandGestureRecognition\bin\Debug\HandGestureRecognition.exe.config
+C:\Users\Eddie\Dropbox\Capstone\Nontic TableDiff\Nontic TableDiff\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.exe
+C:\Users\Eddie\Dropbox\Capstone\Nontic TableDiff\Nontic TableDiff\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.pdb
+C:\Users\Eddie\Dropbox\Capstone\Nontic TableDiff\Nontic TableDiff\HandGestureRecognition\bin\Debug\cvextern.dll
+C:\Users\Eddie\Dropbox\Capstone\Nontic TableDiff\Nontic TableDiff\HandGestureRecognition\bin\Debug\HandGestureRecognition.exe
+C:\Users\Eddie\Dropbox\Capstone\Nontic TableDiff\Nontic TableDiff\HandGestureRecognition\bin\Debug\HandGestureRecognition.pdb
+C:\Users\Eddie\Dropbox\Capstone\Nontic TableDiff\Nontic TableDiff\HandGestureRecognition\bin\Debug\Emgu.CV.dll
+C:\Users\Eddie\Dropbox\Capstone\Nontic TableDiff\Nontic TableDiff\HandGestureRecognition\bin\Debug\Emgu.CV.UI.dll
+C:\Users\Eddie\Dropbox\Capstone\Nontic TableDiff\Nontic TableDiff\HandGestureRecognition\bin\Debug\Emgu.Util.dll
+C:\Users\Eddie\Dropbox\Capstone\Nontic TableDiff\Nontic TableDiff\HandGestureRecognition\bin\Debug\HandGestureRecognition.SkinDetector.dll
+C:\Users\Eddie\Dropbox\Capstone\Nontic TableDiff\Nontic TableDiff\HandGestureRecognition\bin\Debug\HandGestureRecognition.SkinDetector.pdb
+C:\Users\Eddie\Dropbox\Capstone\Nontic TableDiff\Nontic TableDiff\HandGestureRecognition\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Eddie\Dropbox\Capstone\Nontic TableDiff\Nontic TableDiff\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.Form1.resources
+C:\Users\Eddie\Dropbox\Capstone\Nontic TableDiff\Nontic TableDiff\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.Properties.Resources.resources
+C:\Users\Eddie\Dropbox\Capstone\Nontic TableDiff\Nontic TableDiff\HandGestureRecognition\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\Eddie\Dropbox\Capstone\Nontic TableDiff\Nontic TableDiff\HandGestureRecognition\obj\x86\Debug\ResGen.read.1.tlog
+C:\Users\Eddie\Dropbox\Capstone\Nontic TableDiff\Nontic TableDiff\HandGestureRecognition\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\Eddie\Dropbox\Capstone\Nontic TableDiff\Nontic TableDiff\HandGestureRecognition\obj\x86\Debug\ResGen.write.1.tlog
