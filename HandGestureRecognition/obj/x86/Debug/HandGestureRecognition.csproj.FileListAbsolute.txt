@@ -158,3 +158,21 @@ C:\Users\Eddie\Dropbox\Capstone\Nontic TableDiff\Nontic TableDiff\HandGestureRec
 C:\Users\Eddie\Dropbox\Capstone\Nontic TableDiff\Nontic TableDiff\HandGestureRecognition\obj\x86\Debug\ResGen.read.1.tlog
 C:\Users\Eddie\Dropbox\Capstone\Nontic TableDiff\Nontic TableDiff\HandGestureRecognition\obj\x86\Debug\GenerateResource.write.1.tlog
 C:\Users\Eddie\Dropbox\Capstone\Nontic TableDiff\Nontic TableDiff\HandGestureRecognition\obj\x86\Debug\ResGen.write.1.tlog
+C:\fttest\HandGestureRecognition\bin\Debug\HandGestureRecognition.exe.config
+C:\fttest\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.exe
+C:\fttest\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.pdb
+C:\fttest\HandGestureRecognition\bin\Debug\cvextern.dll
+C:\fttest\HandGestureRecognition\bin\Debug\HandGestureRecognition.exe
+C:\fttest\HandGestureRecognition\bin\Debug\HandGestureRecognition.pdb
+C:\fttest\HandGestureRecognition\bin\Debug\Emgu.CV.dll
+C:\fttest\HandGestureRecognition\bin\Debug\Emgu.CV.UI.dll
+C:\fttest\HandGestureRecognition\bin\Debug\Emgu.Util.dll
+C:\fttest\HandGestureRecognition\bin\Debug\HandGestureRecognition.SkinDetector.dll
+C:\fttest\HandGestureRecognition\bin\Debug\HandGestureRecognition.SkinDetector.pdb
+C:\fttest\HandGestureRecognition\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\fttest\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.Form1.resources
+C:\fttest\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.Properties.Resources.resources
+C:\fttest\HandGestureRecognition\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\fttest\HandGestureRecognition\obj\x86\Debug\ResGen.read.1.tlog
+C:\fttest\HandGestureRecognition\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\fttest\HandGestureRecognition\obj\x86\Debug\ResGen.write.1.tlog

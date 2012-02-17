@@ -40,3 +40,10 @@ C:\Nontic\HandGestureRecognition.SkinDetector\bin\Debug\Emgu.Util.dll
 C:\Nontic\HandGestureRecognition.SkinDetector\obj\Debug\ResolveAssemblyReference.cache
 C:\Nontic\HandGestureRecognition.SkinDetector\obj\Debug\HandGestureRecognition.SkinDetector.dll
 C:\Nontic\HandGestureRecognition.SkinDetector\obj\Debug\HandGestureRecognition.SkinDetector.pdb
+C:\fttest\HandGestureRecognition.SkinDetector\bin\Debug\HandGestureRecognition.SkinDetector.dll
+C:\fttest\HandGestureRecognition.SkinDetector\bin\Debug\HandGestureRecognition.SkinDetector.pdb
+C:\fttest\HandGestureRecognition.SkinDetector\bin\Debug\Emgu.CV.dll
+C:\fttest\HandGestureRecognition.SkinDetector\bin\Debug\Emgu.Util.dll
+C:\fttest\HandGestureRecognition.SkinDetector\obj\Debug\ResolveAssemblyReference.cache
+C:\fttest\HandGestureRecognition.SkinDetector\obj\Debug\HandGestureRecognition.SkinDetector.dll
+C:\fttest\HandGestureRecognition.SkinDetector\obj\Debug\HandGestureRecognition.SkinDetector.pdb

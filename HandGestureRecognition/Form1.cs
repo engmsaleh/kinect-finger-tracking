@@ -22,6 +22,7 @@ namespace HandGestureRecognition
         Image<Gray, Int16> currentFrame;
         Image<Gray, Int16> currentFrameCopy;
         Image<Bgr, byte> colorFrame;
+        MouseDriver mouse;
 
         int frameWidth;
         int frameHeight;
@@ -29,7 +30,6 @@ namespace HandGestureRecognition
         private short[] pixelData;
         private short[] pixelDataLast;
         private byte[] depthFrame32;
-        int last_top;
 
         Seq<Point> hull;
         Seq<Point> filteredHull;
@@ -37,7 +37,6 @@ namespace HandGestureRecognition
         MCvConvexityDefect[] defectArray;
         Rectangle handRect;
         MCvBox2D box;
-        Ellipse ellip;
         KinectSensor kinectSensor;
 
         Int32 MAX_INT32;
@@ -54,8 +53,7 @@ namespace HandGestureRecognition
         {
             InitializeComponent();
             box = new MCvBox2D();
-            ellip = new Ellipse();
-            last_top = 0;
+            mouse = new MouseDriver();
             MAX_INT32 = Int32.MaxValue;
             MAX_INT16 = Int16.MaxValue;
             // show status for each sensor that is found now.
@@ -87,7 +85,6 @@ namespace HandGestureRecognition
                     imageFrame.CopyPixelDataTo(this.pixelData);
                     short[, ,] frameData = currentFrame.Data;
                     int pLength = imageFrame.PixelDataLength;
-                    int closest = 32767;
 
                     for (int i = 0; i < pLength; i++)
                     {
@@ -107,29 +104,17 @@ namespace HandGestureRecognition
                             temp = MAX_INT16;
 
                         frameData[thisY, thisX, 0] = (short)temp;
-
-                        if (d < closest && d > 0)
-                            closest = d;
                     }
-                    last_top = closest;
                     pixelDataLast = (short[])pixelData.Clone();
-                    dataOutput.Text = last_top.ToString();
 
-
-                    //currentFrameCopy = currentFrame.Copy();
-
-                    // Uncomment if using opencv adaptive skin detector
-                    //Image<Gray,Byte> skin = new Image<Gray,byte>(currentFrameCopy.Width,currentFrameCopy.Height);                
-                    //detector.Process(currentFrameCopy, skin);                
-
-                    //skinDetector = new YCrCbSkinDetector();
-
-                    //Image<Gray, Byte> skin = skinDetector.DetectSkin(currentFrameCopy, YCrCb_min, YCrCb_max);
                     Image<Gray, byte> cFrameByte = currentFrame.Convert<byte>(delegate(short b) { return (byte)(b >> 8); });
                     colorFrame = cFrameByte.Convert<Bgr,byte>();
 
                     ExtractContourAndHull(cFrameByte);
                     DrawAndComputeFingersNum();
+
+                    //mouse.AddFrame( work in progress here chill out, we need to send it the depth change data (the one that lights up the fingertips) and finger points
+
                     imageBoxFrameGrabber.Image = colorFrame;
                 }
             }
@@ -178,6 +163,7 @@ namespace HandGestureRecognition
 
                     colorFrame.Draw(new CircleF(new PointF(box.center.X, box.center.Y), 3), new Bgr(Color.White), 2);
 
+                    #region unused ellipse code
                     //ellip.MCvBox2D= CvInvoke.cvFitEllipse2(biggestContour.Ptr);
                     //currentFrame.Draw(new Ellipse(ellip.MCvBox2D), new Bgr(Color.LavenderBlush), 3);
 
@@ -189,7 +175,7 @@ namespace HandGestureRecognition
 
                     //CvInvoke.cvEllipse(currentFrame, new Point((int)ellip.MCvBox2D.center.X, (int)ellip.MCvBox2D.center.Y), new System.Drawing.Size((int)ellip.MCvBox2D.size.Width, (int)ellip.MCvBox2D.size.Height), ellip.MCvBox2D.angle, 0, 360, new MCvScalar(120, 233, 88), 1, Emgu.CV.CvEnum.LINE_TYPE.EIGHT_CONNECTED, 0);
                     //currentFrame.Draw(new Ellipse(new PointF(box.center.X, box.center.Y), new SizeF(box.size.Height, box.size.Width), box.angle), new Bgr(0, 0, 0), 2);
-
+                    #endregion
 
                     filteredHull = new Seq<Point>(storage);
                     for (int i = 0; i < hull.Total; i++)
