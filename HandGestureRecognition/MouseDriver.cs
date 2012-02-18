@@ -13,7 +13,7 @@ namespace HandGestureRecognition
     {
         int pointSetCount;
         ArrayList pointSets;
-        Contour<PointF> movementContour
+        Contour<PointF> movementContour;
         public MouseDriver()
         {
             pointSetCount = 0;
@@ -23,7 +23,7 @@ namespace HandGestureRecognition
         {
             pointSetCount = 0;
             pointSets = new ArrayList();
-            addFrame(points);
+            addFrame(points, movementContour);
         }
 
         public void addFrame(Seq<PointF> points, Contour<PointF> movementContour) 
