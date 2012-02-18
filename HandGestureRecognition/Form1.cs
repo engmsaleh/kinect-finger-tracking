@@ -23,7 +23,7 @@ namespace HandGestureRecognition
         Image<Gray, Int16> currentFrameCopy;
         Image<Bgr, byte> colorFrame;
         MouseDriver mouse;
-
+        
         int frameWidth;
         int frameHeight;
         private short[] tableData;
@@ -101,7 +101,7 @@ namespace HandGestureRecognition
                         if (d <= 0 || Math.Abs(tableTemp) < 25 /*|| Math.Abs(temp) < 100*/ || d > 10000)
                             temp = 0;
                         else
-                            temp = MAX_INT16;
+                            temp = MAX_INT32;
 
                         frameData[thisY, thisX, 0] = (short)temp;
                     }

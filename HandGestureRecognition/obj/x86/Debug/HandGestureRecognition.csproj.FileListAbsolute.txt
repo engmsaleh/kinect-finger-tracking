@@ -194,3 +194,6 @@ C:\blahstuff\HandGestureRecognition\bin\Debug\Emgu.CV.UI.dll
 C:\blahstuff\HandGestureRecognition\bin\Debug\Emgu.Util.dll
 C:\blahstuff\HandGestureRecognition\bin\Debug\HandGestureRecognition.SkinDetector.dll
 C:\blahstuff\HandGestureRecognition\bin\Debug\HandGestureRecognition.SkinDetector.pdb
+C:\Nontiq\HandGestureRecognition\bin\Debug\HandGestureRecognition.exe.config
+C:\Nontiq\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.exe
+C:\Nontiq\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.pdb
