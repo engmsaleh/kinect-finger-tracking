@@ -26,14 +26,14 @@ namespace HandGestureRecognition
             vectors = new Queue<Vector>(4);
         }
 
-        public MouseDriver(Seq<PointF> points, Contour<PointF> movementContour)
+        public MouseDriver(Seq<PointF> points, Contour<System.Drawing.Point> movementContour)
         {
             pointSetCount = 0;
             pointSets = new Seq<PointF>[5];
             AddFrame(points, movementContour);
         }
 
-        public void AddFrame(Seq<PointF> points, Contour<PointF> movementContour) 
+        public void AddFrame(Seq<PointF> points, Contour<System.Drawing.Point> movementContour) 
         {
             if (pointSetCount < 5)
                 pointSetCount++;
@@ -51,7 +51,7 @@ namespace HandGestureRecognition
             foreach (Seq<PointF> pointSeq in pointSets) {
                 int avX = 0;
                 int avY = 0;
-                foreach (PointF point in pointSets.)
+                foreach (PointF point in pointSets)
                 {
                     avX += (int)point.X;
                     avY += (int)point.Y;

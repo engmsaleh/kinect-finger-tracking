@@ -20,10 +20,11 @@ namespace HandGestureRecognition
         IColorSkinDetector skinDetector;
 
         Image<Gray, Int16> currentFrame;
-        Image<Gray, Int16> currentFrameCopy;
+        Image<Gray, byte> movement;
         Image<Bgr, byte> colorFrame;
         MouseDriver mouse;
-        
+        Contour<Point> shapeContour;
+
         int frameWidth;
         int frameHeight;
         private short[] tableData;
@@ -44,9 +45,8 @@ namespace HandGestureRecognition
 
 
         //eddie
-        Seq<PointF> dPointList;
+        Seq<PointF> dPointList; // All the points on the contour
         Seq<PointF> realendPointList;
-        PointF palm;
         double stdev;
 
         public Form1()
@@ -77,13 +77,15 @@ namespace HandGestureRecognition
                         frameHeight = imageFrame.Height;
                         pixelData = new short[imageFrame.PixelDataLength];
                         depthFrame32 = new byte[frameWidth * frameHeight * 4];
-                        currentFrame = new Image<Gray, Int16>(frameWidth, frameHeight, new Gray(0.9));
+                        currentFrame = new Image<Gray, Int16>(frameWidth, frameHeight, new Gray(0));
+                        movement = new Image<Gray, byte>(frameWidth, frameHeight, new Gray(0));
                         pixelDataLast = new short[imageFrame.PixelDataLength];
                         tableData = new short[imageFrame.PixelDataLength];
                         imageFrame.CopyPixelDataTo(this.tableData);
                     }
                     imageFrame.CopyPixelDataTo(this.pixelData);
                     short[, ,] frameData = currentFrame.Data;
+                    byte[, ,] moveData = movement.Data;
                     int pLength = imageFrame.PixelDataLength;
 
                     for (int i = 0; i < pLength; i++)
@@ -91,29 +93,31 @@ namespace HandGestureRecognition
                         int thisX = (int)(i % frameWidth);
                         int thisY = (int)(i / frameWidth);
                         short d = pixelData[i];
-                        int temp = pixelData[i] - pixelDataLast[i];
+                        int moveCalc = pixelData[i] - pixelDataLast[i];
+                        int temp;
                         int tableTemp = pixelData[i] - tableData[i];
                         /*if (d <= 0)
                             temp = MAX_INT16;
                         else
                             temp = pixelData[i] - pixelDataLast[i];
-                         * */
-                        if (d <= 0 || Math.Abs(tableTemp) < 25 /*|| Math.Abs(temp) < 100*/ || d > 10000)
+                        * */
+                        if (d <= 0 || Math.Abs(tableTemp) < 25 || d > 10000)
                             temp = 0;
                         else
-                            temp = MAX_INT32;
-
+                            temp = MAX_INT16;
+                        if (d >= 0 && Math.Abs(moveCalc) > 75 && d < 10000)
+                            moveData[thisY, thisX, 0] = 255;
+                        else
+                            moveData[thisY, thisX, 0] = 0;
                         frameData[thisY, thisX, 0] = (short)temp;
                     }
                     pixelDataLast = (short[])pixelData.Clone();
 
                     Image<Gray, byte> cFrameByte = currentFrame.Convert<byte>(delegate(short b) { return (byte)(b >> 8); });
-                    colorFrame = cFrameByte.Convert<Bgr,byte>();
+                    colorFrame = cFrameByte.Convert<Bgr, byte>();
 
                     ExtractContourAndHull(cFrameByte);
                     DrawAndComputeFingersNum();
-
-                    //mouse.AddFrame( work in progress here chill out, we need to send it the depth change data (the one that lights up the fingertips) and finger points
 
                     imageBoxFrameGrabber.Image = colorFrame;
                 }
@@ -137,6 +141,21 @@ namespace HandGestureRecognition
                         biggestContour = contours;
                     }
                     contours = contours.HNext;
+                }
+
+                Contour<Point> mvContours = movement.FindContours(Emgu.CV.CvEnum.CHAIN_APPROX_METHOD.CV_CHAIN_APPROX_SIMPLE, Emgu.CV.CvEnum.RETR_TYPE.CV_RETR_LIST, storage);
+
+                Result2 = 80;
+                while (mvContours != null)
+                {
+                    Result1 = mvContours.Area;
+                    if (Result1 > 150)
+                    {
+                        Result2 = Result1;
+                        shapeContour = mvContours.ApproxPoly(mvContours.Perimeter * 0.0025, storage);
+                        colorFrame.Draw(shapeContour, new Bgr(0, 0, 255), 2);
+                    }
+                    mvContours = mvContours.HNext;
                 }
 
                 if (biggestContour != null)
@@ -192,10 +211,11 @@ namespace HandGestureRecognition
 
 
                     PointF dpcpoint;
-                    
+
                     dPointList = new Seq<PointF>(storage);
                     //find depth point circle- eddie
-                    for (int i = 0; i < defectArray.Length; i++) {
+                    for (int i = 0; i < defectArray.Length; i++)
+                    {
                         dpcpoint = new PointF((float)defectArray[i].StartPoint.X, (float)defectArray[i].StartPoint.Y);
                         dPointList.Push(dpcpoint);
                     }
@@ -207,7 +227,8 @@ namespace HandGestureRecognition
                     realendPointList = new Seq<PointF>(storage);
                     for (int i = 0; i < endpointarray.Length; i++)
                     {
-                        if (endpointarray[i].Y < center.Y) {
+                        if (endpointarray[i].Y < center.Y)
+                        {
                             realendPointList.Push(dPointList[i]);
                         }
                     }
@@ -216,57 +237,63 @@ namespace HandGestureRecognition
                     // convert to depth pointF array
                     PointF[] dpointlistarr = dPointList.ToArray<PointF>();
                     double[] distarr = new double[dpointlistarr.Length];
-                    
+                    /*
                     double dist;
                     double total = 0;
                     // calculate distance for each point
-                    for (int i = 0; i < dpointlistarr.Length; i++) { 
+                    for (int i = 0; i < dpointlistarr.Length; i++)
+                    {
                         dist = Math.Sqrt(Math.Pow((dpointlistarr[i].X - palm.X), 2) + Math.Pow((dpointlistarr[i].Y - palm.Y), 2));
                         distarr[i] = dist;
                         total = total + dist;
                     }
                     double avg = total / distarr.Length;
 
-                    double dev;
                     double[] temp = new double[distarr.Length];
                     //calculate stdev from palm for points
-                    for (int i = 0; i < distarr.Length; i++) {
+                    for (int i = 0; i < distarr.Length; i++)
+                    {
                         temp[i] = (distarr[i] - avg);
                     }
 
                     // square each dev
                     double[] devarr = new double[temp.Length];
                     total = 0;
-                    for (int i = 0; i < temp.Length; i++) {
+                    for (int i = 0; i < temp.Length; i++)
+                    {
                         devarr[i] = Math.Pow(temp[i], 2);
                         total = total + devarr[i];
                     }
                     total = total / (distarr.Length - 1);
 
                     stdev = Math.Sqrt(total);
-                    label1.Text = "stdev = " + stdev + "\n center of Palm: " + palm.X + ", " + palm.Y;
+                    label1.Text = "stdev = " + stdev + "\n center of Palm: " + palm.X + ", " + palm.Y;*/
                 }
+
             }
         }
 
         private void DrawAndComputeFingersNum()
         {
+            /*BlobTrackerAutoParam<Gray> param = new BlobTrackerAutoParam<Gray>();
+            param.FGDetector = new FGDetector<Gray>(Emgu.CV.CvEnum.FORGROUND_DETECTOR_TYPE.FGD);
+            param.FGTrainFrames = 10;
+            BlobTrackerAuto<Gray> tracker = new BlobTrackerAuto<Gray>(param);*/
+
+
             int fingerNum = 0;
 
             #region hull drawing
             //for (int i = 0; i < filteredHull.Total; i++)
             //{
-            //    PointF hullPoint = new PointF((float)filteredHull[i].X,
-            //                                  (float)filteredHull[i].Y);
-            //    CircleF hullCircle = new CircleF(hullPoint, 4);
-            //    currentFrame.Draw(hullCircle, new Bgr(Color.Aquamarine), 2);
+            //	PointF hullPoint = new PointF((float)filteredHull[i].X,
+            //                              	(float)filteredHull[i].Y);
+            //	CircleF hullCircle = new CircleF(hullPoint, 4);
+            //	currentFrame.Draw(hullCircle, new Bgr(Color.Aquamarine), 2);
             //}
             #endregion
 
             #region defects drawing
-            PointF newEndPoint;
-            float nepx;
-            float nepy;
             if (defects != null)
             {
                 for (int i = 0; i < defects.Total; i++)
@@ -279,8 +306,6 @@ namespace HandGestureRecognition
 
                     PointF endPoint = new PointF((float)defectArray[i].EndPoint.X,
                                                     (float)defectArray[i].EndPoint.Y);
-
-                    nepx = defectArray[i].StartPoint.X;
 
                     LineSegment2D startDepthLine = new LineSegment2D(defectArray[i].StartPoint, defectArray[i].DepthPoint);
 
@@ -303,19 +328,21 @@ namespace HandGestureRecognition
 
                     currentFrame.Draw(startCircle, new Gray(MAX_INT32), 2);
                     currentFrame.Draw(depthCircle, new Gray(MAX_INT32), 5);
-                    if (Math.Sqrt(Math.Pow(depthCircle.Center.X - palm.X, 2) + Math.Pow(depthCircle.Center.Y - palm.Y, 2)) < (stdev * 3))
+                    /*if (Math.Sqrt(Math.Pow(depthCircle.Center.X - palm.X, 2) + Math.Pow(depthCircle.Center.Y - palm.Y, 2)) < (stdev * 3))
                     {
                         colorFrame.Draw(depthCircle, new Bgr(Color.Yellow), 2);
                     }
-                    else {
+                    else
+                    {
                         colorFrame.Draw(depthCircle, new Bgr(Color.Yellow), 2);
-                    }
+                    }*/
                     //colorFrame.Draw(startCircle, new Bgr(Color.Red), 2);
                     //currentFrame.Draw(endCircle, new Bgr(Color.DarkBlue), 4);
                     //colorFrame.Draw(endCircle, new Bgr(Color.DarkBlue), 3);
-                    
+
                 }
-                if (realendPointList.Total > 0) {
+                if (realendPointList.Total > 0)
+                {
                     PointF[] temp = realendPointList.ToArray();
                     for (int i = 0; i < temp.Length; i++)
                     {
@@ -326,8 +353,10 @@ namespace HandGestureRecognition
             }
             #endregion
 
+            mouse.AddFrame(dPointList, shapeContour);
+
             MCvFont font = new MCvFont(Emgu.CV.CvEnum.FONT.CV_FONT_HERSHEY_DUPLEX, 5d, 5d);
-            colorFrame.Draw(new CircleF(palm, 1), new Bgr(Color.Cyan), 6);
+            //colorFrame.Draw(new CircleF(palm, 1), new Bgr(Color.Cyan), 6);
             colorFrame.Draw(fingerNum.ToString(), ref font, new Point(50, 150), new Bgr(255, 10, 10));
         }
     }
