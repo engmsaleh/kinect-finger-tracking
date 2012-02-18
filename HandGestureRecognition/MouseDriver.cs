@@ -14,41 +14,44 @@ namespace HandGestureRecognition
     class MouseDriver
     {
         int pointSetCount;
-        ArrayList pointSets;
-        Contour<PointF> movementContour;
-        Vector[] vectors;
+        Seq<PointF>[] pointSets;
+        Contour<System.Drawing.Point> movementContour;
+        Queue<Vector> vectors;
+        System.Drawing.Point destination;
 
         public MouseDriver()
         {
             pointSetCount = 0;
-            pointSets = new ArrayList();
-            vectors = new Vector[3];
+            pointSets = new Seq<PointF>[5];
+            vectors = new Queue<Vector>(4);
         }
 
         public MouseDriver(Seq<PointF> points, Contour<PointF> movementContour)
         {
             pointSetCount = 0;
-            pointSets = new ArrayList();
-            addFrame(points, movementContour);
+            pointSets = new Seq<PointF>[5];
+            AddFrame(points, movementContour);
         }
 
-        public void addFrame(Seq<PointF> points, Contour<PointF> movementContour) 
+        public void AddFrame(Seq<PointF> points, Contour<PointF> movementContour) 
         {
             if (pointSetCount < 5)
                 pointSetCount++;
             else
-                pointSets.RemoveAt(0);
+                pointSets.Dequeue();
 
-            pointSets.Add(points);
+            pointSets.Enqueue(points);
+            UpdateVectors();
         }
 
-        public Vector[] getVectors()
+        //change so it only changes 1 at a time
+        public void UpdateVectors()
         {
             Queue<System.Drawing.Point> tomake = new Queue<System.Drawing.Point>(5);
             foreach (Seq<PointF> pointSeq in pointSets) {
                 int avX = 0;
                 int avY = 0;
-                foreach (PointF point in pointSeq)
+                foreach (PointF point in pointSets.)
                 {
                     avX += (int)point.X;
                     avY += (int)point.Y;
@@ -59,7 +62,9 @@ namespace HandGestureRecognition
             }
             foreach (System.Drawing.Point point in tomake)
             {
-                Vector v = new Vector(tomake.Peek().X - 
+                tomake.Dequeue();
+                Vector v = new Vector(tomake.Peek().X - point.X, tomake.Peek().Y - point.Y);
+                this.vectors.Enqueue(v);
             }
         }
     }
