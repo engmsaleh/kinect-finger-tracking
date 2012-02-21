@@ -54,3 +54,10 @@ C:\blahstuff\HandGestureRecognition.SkinDetector\bin\Debug\Emgu.Util.dll
 C:\blahstuff\HandGestureRecognition.SkinDetector\obj\Debug\ResolveAssemblyReference.cache
 C:\blahstuff\HandGestureRecognition.SkinDetector\obj\Debug\HandGestureRecognition.SkinDetector.dll
 C:\blahstuff\HandGestureRecognition.SkinDetector\obj\Debug\HandGestureRecognition.SkinDetector.pdb
+C:\Users\Eddie\Documents\zzz\HandGestureRecognition.SkinDetector\bin\Debug\HandGestureRecognition.SkinDetector.dll
+C:\Users\Eddie\Documents\zzz\HandGestureRecognition.SkinDetector\bin\Debug\HandGestureRecognition.SkinDetector.pdb
+C:\Users\Eddie\Documents\zzz\HandGestureRecognition.SkinDetector\bin\Debug\Emgu.CV.dll
+C:\Users\Eddie\Documents\zzz\HandGestureRecognition.SkinDetector\bin\Debug\Emgu.Util.dll
+C:\Users\Eddie\Documents\zzz\HandGestureRecognition.SkinDetector\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Eddie\Documents\zzz\HandGestureRecognition.SkinDetector\obj\Debug\HandGestureRecognition.SkinDetector.dll
+C:\Users\Eddie\Documents\zzz\HandGestureRecognition.SkinDetector\obj\Debug\HandGestureRecognition.SkinDetector.pdb
