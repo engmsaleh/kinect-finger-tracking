@@ -119,7 +119,7 @@ namespace HandGestureRecognition
                     ExtractContourAndHull(cFrameByte);
                     DrawAndComputeFingersNum();
 
-                    imageBoxFrameGrabber.Image = colorFrame;
+                    imageBoxFrameGrabber.Image = cFrameByte;
                 }
             }
         }
@@ -160,7 +160,6 @@ namespace HandGestureRecognition
 
                 if (biggestContour != null)
                 {
-                    //currentFrame.Draw(biggestContour, new Bgr(Color.DarkViolet), 2);
                     Contour<Point> currentContour = biggestContour.ApproxPoly(biggestContour.Perimeter * 0.0025, storage);
                     currentFrame.Draw(currentContour, new Gray(MAX_INT32), 2);
                     biggestContour = currentContour;
@@ -169,8 +168,6 @@ namespace HandGestureRecognition
                     hull = biggestContour.GetConvexHull(Emgu.CV.CvEnum.ORIENTATION.CV_CLOCKWISE);
                     box = biggestContour.GetMinAreaRect();
                     PointF[] points = box.GetVertices();
-                    //handRect = box.MinAreaRect();
-                    //currentFrame.Draw(handRect, new Bgr(200, 0, 0), 1);
 
                     Point[] ps = new Point[points.Length];
                     for (int i = 0; i < points.Length; i++)
@@ -181,20 +178,6 @@ namespace HandGestureRecognition
                     currentFrame.Draw(new CircleF(new PointF(box.center.X, box.center.Y), 3), new Gray(MAX_INT32), 2);
 
                     colorFrame.Draw(new CircleF(new PointF(box.center.X, box.center.Y), 3), new Bgr(Color.White), 2);
-
-                    #region unused ellipse code
-                    //ellip.MCvBox2D= CvInvoke.cvFitEllipse2(biggestContour.Ptr);
-                    //currentFrame.Draw(new Ellipse(ellip.MCvBox2D), new Bgr(Color.LavenderBlush), 3);
-
-                    //CvInvoke.cvMinEnclosingCircle(biggestContour.Ptr, out  center, out  radius);
-                    //currentFrame.Draw(new CircleF(center, radius), new Bgr(Color.Gold), 2);
-
-                    //currentFrame.Draw(new CircleF(new PointF(ellip.MCvBox2D.center.X, ellip.MCvBox2D.center.Y), 3), new Bgr(100, 25, 55), 2);
-                    //currentFrame.Draw(ellip, new Bgr(Color.DeepPink), 2);
-
-                    //CvInvoke.cvEllipse(currentFrame, new Point((int)ellip.MCvBox2D.center.X, (int)ellip.MCvBox2D.center.Y), new System.Drawing.Size((int)ellip.MCvBox2D.size.Width, (int)ellip.MCvBox2D.size.Height), ellip.MCvBox2D.angle, 0, 360, new MCvScalar(120, 233, 88), 1, Emgu.CV.CvEnum.LINE_TYPE.EIGHT_CONNECTED, 0);
-                    //currentFrame.Draw(new Ellipse(new PointF(box.center.X, box.center.Y), new SizeF(box.size.Height, box.size.Width), box.angle), new Bgr(0, 0, 0), 2);
-                    #endregion
 
                     filteredHull = new Seq<Point>(storage);
                     for (int i = 0; i < hull.Total; i++)
@@ -237,37 +220,6 @@ namespace HandGestureRecognition
                     // convert to depth pointF array
                     PointF[] dpointlistarr = dPointList.ToArray<PointF>();
                     double[] distarr = new double[dpointlistarr.Length];
-                    /*
-                    double dist;
-                    double total = 0;
-                    // calculate distance for each point
-                    for (int i = 0; i < dpointlistarr.Length; i++)
-                    {
-                        dist = Math.Sqrt(Math.Pow((dpointlistarr[i].X - palm.X), 2) + Math.Pow((dpointlistarr[i].Y - palm.Y), 2));
-                        distarr[i] = dist;
-                        total = total + dist;
-                    }
-                    double avg = total / distarr.Length;
-
-                    double[] temp = new double[distarr.Length];
-                    //calculate stdev from palm for points
-                    for (int i = 0; i < distarr.Length; i++)
-                    {
-                        temp[i] = (distarr[i] - avg);
-                    }
-
-                    // square each dev
-                    double[] devarr = new double[temp.Length];
-                    total = 0;
-                    for (int i = 0; i < temp.Length; i++)
-                    {
-                        devarr[i] = Math.Pow(temp[i], 2);
-                        total = total + devarr[i];
-                    }
-                    total = total / (distarr.Length - 1);
-
-                    stdev = Math.Sqrt(total);
-                    label1.Text = "stdev = " + stdev + "\n center of Palm: " + palm.X + ", " + palm.Y;*/
                 }
 
             }
@@ -353,7 +305,7 @@ namespace HandGestureRecognition
             }
             #endregion
 
-            mouse.AddFrame(dPointList, shapeContour);
+            //mouse.AddFrame(dPointList, shapeContour);
 
             MCvFont font = new MCvFont(Emgu.CV.CvEnum.FONT.CV_FONT_HERSHEY_DUPLEX, 5d, 5d);
             //colorFrame.Draw(new CircleF(palm, 1), new Bgr(Color.Cyan), 6);

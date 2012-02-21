@@ -37,15 +37,15 @@
             // imageBoxFrameGrabber
             // 
             this.imageBoxFrameGrabber.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.imageBoxFrameGrabber.Location = new System.Drawing.Point(0, 0);
+            this.imageBoxFrameGrabber.Location = new System.Drawing.Point(0, 2);
             this.imageBoxFrameGrabber.Name = "imageBoxFrameGrabber";
-            this.imageBoxFrameGrabber.Size = new System.Drawing.Size(485, 391);
+            this.imageBoxFrameGrabber.Size = new System.Drawing.Size(574, 391);
             this.imageBoxFrameGrabber.TabIndex = 3;
             this.imageBoxFrameGrabber.TabStop = false;
             // 
             // dataOutput
             // 
-            this.dataOutput.Location = new System.Drawing.Point(538, 12);
+            this.dataOutput.Location = new System.Drawing.Point(583, 12);
             this.dataOutput.Name = "dataOutput";
             this.dataOutput.Size = new System.Drawing.Size(100, 20);
             this.dataOutput.TabIndex = 4;
@@ -53,7 +53,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(538, 49);
+            this.label1.Location = new System.Drawing.Point(580, 47);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(35, 13);
             this.label1.TabIndex = 5;
@@ -63,7 +63,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(650, 391);
+            this.ClientSize = new System.Drawing.Size(704, 396);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.dataOutput);
             this.Controls.Add(this.imageBoxFrameGrabber);

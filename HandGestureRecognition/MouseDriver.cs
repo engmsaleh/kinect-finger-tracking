@@ -14,58 +14,90 @@ namespace HandGestureRecognition
     class MouseDriver
     {
         int pointSetCount;
-        Seq<PointF>[] pointSets;
+        Seq<PointF> latestPoints;
         Contour<System.Drawing.Point> movementContour;
-        Queue<Vector> vectors;
+        //Queue<Vector> vectors;
+        Queue<int[]> vectors;
+        System.Drawing.Point last;
+        
+        //Cursor Variables
+        System.Drawing.Point position;
         System.Drawing.Point destination;
 
         public MouseDriver()
         {
             pointSetCount = 0;
-            pointSets = new Seq<PointF>[5];
-            vectors = new Queue<Vector>(4);
+            vectors = new Queue<int[]>(4);
+            position = new System.Drawing.Point(0, 0);
+            destination = new System.Drawing.Point(0, 0);
         }
 
         public MouseDriver(Seq<PointF> points, Contour<System.Drawing.Point> movementContour)
         {
             pointSetCount = 0;
-            pointSets = new Seq<PointF>[5];
             AddFrame(points, movementContour);
+            position = new System.Drawing.Point(0, 0);
+            destination = new System.Drawing.Point(0, 0);
         }
 
         public void AddFrame(Seq<PointF> points, Contour<System.Drawing.Point> movementContour) 
         {
-            if (pointSetCount < 5)
-                pointSetCount++;
-            else
-                pointSets.Dequeue();
-
-            pointSets.Enqueue(points);
+            latestPoints = points;
             UpdateVectors();
+            UpdateCursor();
         }
 
         //change so it only changes 1 at a time
         public void UpdateVectors()
         {
-            Queue<System.Drawing.Point> tomake = new Queue<System.Drawing.Point>(5);
-            foreach (Seq<PointF> pointSeq in pointSets) {
+            if (latestPoints != null)
+            {
+                //Determine average X and Y of most recent point
                 int avX = 0;
                 int avY = 0;
-                foreach (PointF point in pointSets)
+                foreach (PointF point in latestPoints)
                 {
                     avX += (int)point.X;
                     avY += (int)point.Y;
                 }
                 avX /= 5;
                 avY /= 5;
-                tomake.Enqueue(new System.Drawing.Point(avX, avY));
+                System.Drawing.Point temp = new System.Drawing.Point(avX, avY);
+
+                //If first point
+                if (last == null)
+                {
+                    last = temp;
+                    position = temp;
+                }
+                //If there is a last point
+                else
+                {
+                    vectors.Enqueue(new int[] {temp.X - last.X, temp.Y - last.Y});
+                    last = temp;
+                }
             }
-            foreach (System.Drawing.Point point in tomake)
+        }
+
+        public void UpdateCursor()
+        {
+            if (vectors.Count == 4)
             {
-                tomake.Dequeue();
-                Vector v = new Vector(tomake.Peek().X - point.X, tomake.Peek().Y - point.Y);
-                this.vectors.Enqueue(v);
+                var itr = vectors.AsEnumerable();
+                int[] addvectors = new int[2];
+                foreach (int[] victor in itr)
+                {
+                    addvectors[0] += victor[0];
+                    addvectors[1] += victor[1];
+                }
+                destination = position;
+                destination.Offset(addvectors[0], addvectors[1]);
+
+                position.Offset(addvectors[0] / 5, addvectors[1] / 5);
+
+
             }
+            Cursor.Position = position;
         }
     }
 }
