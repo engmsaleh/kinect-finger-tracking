@@ -101,7 +101,7 @@ namespace HandGestureRecognition
                         else
                             temp = pixelData[i] - pixelDataLast[i];
                         * */
-                        if (d <= 0 || Math.Abs(tableTemp) < 25 || d > 10000)
+                        if (d <= 0 || Math.Abs(tableTemp) < 100 || d > 10000)
                             temp = 0;
                         else
                             temp = MAX_INT16;
@@ -119,7 +119,7 @@ namespace HandGestureRecognition
                     ExtractContourAndHull(cFrameByte);
                     DrawAndComputeFingersNum();
 
-                    imageBoxFrameGrabber.Image = cFrameByte;
+                    imageBoxFrameGrabber.Image = colorFrame;
                 }
             }
         }
@@ -210,10 +210,8 @@ namespace HandGestureRecognition
                     realendPointList = new Seq<PointF>(storage);
                     for (int i = 0; i < endpointarray.Length; i++)
                     {
-                        if (endpointarray[i].Y < center.Y)
-                        {
+                        //if (endpointarray[i].Y > center.Y)
                             realendPointList.Push(dPointList[i]);
-                        }
                     }
                     //palm = center;
 
@@ -288,9 +286,9 @@ namespace HandGestureRecognition
                     {
                         colorFrame.Draw(depthCircle, new Bgr(Color.Yellow), 2);
                     }*/
-                    //colorFrame.Draw(startCircle, new Bgr(Color.Red), 2);
+                    colorFrame.Draw(startCircle, new Bgr(Color.Red), 2);
                     //currentFrame.Draw(endCircle, new Bgr(Color.DarkBlue), 4);
-                    //colorFrame.Draw(endCircle, new Bgr(Color.DarkBlue), 3);
+                    colorFrame.Draw(endCircle, new Bgr(Color.DarkBlue), 3);
 
                 }
                 if (realendPointList.Total > 0)
@@ -305,7 +303,7 @@ namespace HandGestureRecognition
             }
             #endregion
 
-            //mouse.AddFrame(dPointList, shapeContour);
+            mouse.AddFrame(dPointList, shapeContour);
 
             MCvFont font = new MCvFont(Emgu.CV.CvEnum.FONT.CV_FONT_HERSHEY_DUPLEX, 5d, 5d);
             //colorFrame.Draw(new CircleF(palm, 1), new Bgr(Color.Cyan), 6);

@@ -43,8 +43,14 @@ namespace HandGestureRecognition
         public void AddFrame(Seq<PointF> points, Contour<System.Drawing.Point> movementContour) 
         {
             latestPoints = points;
-            UpdateVectors();
-            UpdateCursor();
+            if (points != null)
+            {
+                PointF[] test = points.ToArray();
+                System.Drawing.Point posish = new System.Drawing.Point((int)test[0].X, (int)test[0].Y);
+                Cursor.Position = posish;
+            }
+            //UpdateVectors();
+            //UpdateCursor();
         }
 
         //change so it only changes 1 at a time
