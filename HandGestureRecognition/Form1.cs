@@ -17,8 +17,6 @@ namespace HandGestureRecognition
     public partial class Form1 : Form
     {
 
-        IColorSkinDetector skinDetector;
-
         Image<Gray, Int16> currentFrame;
         Image<Gray, byte> movement;
         Image<Bgr, byte> colorFrame;
@@ -36,9 +34,7 @@ namespace HandGestureRecognition
         Seq<Point> filteredHull;
         Seq<MCvConvexityDefect> defects;
         MCvConvexityDefect[] defectArray;
-        Rectangle handRect;
         MCvBox2D box;
-        KinectSensor kinectSensor;
 
         Int32 MAX_INT32;
         Int32 MAX_INT16;
@@ -47,7 +43,6 @@ namespace HandGestureRecognition
         //eddie
         Seq<PointF> dPointList; // All the points on the contour
         Seq<PointF> realendPointList;
-        double stdev;
 
         public Form1()
         {
@@ -202,18 +197,15 @@ namespace HandGestureRecognition
                         dpcpoint = new PointF((float)defectArray[i].StartPoint.X, (float)defectArray[i].StartPoint.Y);
                         dPointList.Push(dpcpoint);
                     }
-                    PointF center;
-                    float radius;
 
                     PointF[] endpointarray = dPointList.ToArray();
-                    CvInvoke.cvMinEnclosingCircle(dPointList.Ptr, out center, out radius);
+
                     realendPointList = new Seq<PointF>(storage);
                     for (int i = 0; i < endpointarray.Length; i++)
                     {
                         //if (endpointarray[i].Y > center.Y)
-                            realendPointList.Push(dPointList[i]);
+                        realendPointList.Push(dPointList[i]);
                     }
-                    //palm = center;
 
                     // convert to depth pointF array
                     PointF[] dpointlistarr = dPointList.ToArray<PointF>();
@@ -303,7 +295,10 @@ namespace HandGestureRecognition
             }
             #endregion
 
-            mouse.AddFrame(dPointList, shapeContour);
+            if(mouse.AddFrame(dPointList, fingerNum, shapeContour)) 
+                dataOutput.Text = "watching";
+            else
+                dataOutput.Text = "not watching";
 
             MCvFont font = new MCvFont(Emgu.CV.CvEnum.FONT.CV_FONT_HERSHEY_DUPLEX, 5d, 5d);
             //colorFrame.Draw(new CircleF(palm, 1), new Bgr(Color.Cyan), 6);
