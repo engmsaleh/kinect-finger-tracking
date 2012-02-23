@@ -89,7 +89,7 @@ namespace HandGestureRecognition
                 }*/
 
                 UpdateVectors(fingerNum, new MCvPoint2D64f());
-                UpdateCursor();
+                //UpdateCursor();
             }
             return watching;
         }

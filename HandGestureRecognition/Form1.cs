@@ -30,6 +30,8 @@ namespace HandGestureRecognition
         private byte[] depthFrame32;
         bool recalibrate;
 
+        Kalman kalman;
+
         Seq<Point> hull;
         Seq<Point> filteredHull;
         Seq<MCvConvexityDefect> defects;
@@ -52,6 +54,14 @@ namespace HandGestureRecognition
             MAX_INT32 = Int32.MaxValue;
             MAX_INT16 = Int16.MaxValue;
             recalibrate = true;
+            /*float[,] tranisitionMatrix = {{1,0,1,0},{0,1,0,1},{0,0,1,0},{0,1,0,0}};
+            kalman = new Kalman(4, 2, 0);
+            kalman.TransitionMatrix = new Matrix<float>(tranisitionMatrix);
+            kalman.MeasurementMatrix.SetIdentity();
+            kalman.ProcessNoiseCovariance.SetIdentity(new MCvScalar(1e-4));
+            kalman.MeasurementNoiseCovariance.SetIdentity(new MCvScalar(1e-1));
+            kalman.ErrorCovariancePost.SetIdentity(new MCvScalar(.1));
+            kalman.PredictedState.*/
             // show status for each sensor that is found now.
             foreach (KinectSensor kinect in KinectSensor.KinectSensors)
             {

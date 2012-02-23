@@ -95,8 +95,6 @@ C:\Users\Phillip\Desktop\Nontic\HandGestureRecognition\bin\Debug\HandGestureReco
 C:\Users\Phillip\Desktop\Nontic\HandGestureRecognition\bin\Debug\Emgu.CV.dll
 C:\Users\Phillip\Desktop\Nontic\HandGestureRecognition\bin\Debug\Emgu.CV.UI.dll
 C:\Users\Phillip\Desktop\Nontic\HandGestureRecognition\bin\Debug\Emgu.Util.dll
-C:\Users\Phillip\Desktop\Nontic\HandGestureRecognition\bin\Debug\HandGestureRecognition.SkinDetector.dll
-C:\Users\Phillip\Desktop\Nontic\HandGestureRecognition\bin\Debug\HandGestureRecognition.SkinDetector.pdb
 C:\Users\Phillip\Desktop\Nontic\HandGestureRecognition\obj\x86\Debug\ResolveAssemblyReference.cache
 C:\Users\Phillip\Desktop\Nontic\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.Form1.resources
 C:\Users\Phillip\Desktop\Nontic\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.Properties.Resources.resources

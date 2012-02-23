@@ -37,15 +37,15 @@
             // imageBoxFrameGrabber
             // 
             this.imageBoxFrameGrabber.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.imageBoxFrameGrabber.Location = new System.Drawing.Point(0, 0);
+            this.imageBoxFrameGrabber.Location = new System.Drawing.Point(10, 12);
             this.imageBoxFrameGrabber.Name = "imageBoxFrameGrabber";
-            this.imageBoxFrameGrabber.Size = new System.Drawing.Size(574, 391);
+            this.imageBoxFrameGrabber.Size = new System.Drawing.Size(640, 480);
             this.imageBoxFrameGrabber.TabIndex = 3;
             this.imageBoxFrameGrabber.TabStop = false;
             // 
             // dataOutput
             // 
-            this.dataOutput.Location = new System.Drawing.Point(592, 12);
+            this.dataOutput.Location = new System.Drawing.Point(671, 12);
             this.dataOutput.Name = "dataOutput";
             this.dataOutput.Size = new System.Drawing.Size(100, 20);
             this.dataOutput.TabIndex = 4;
@@ -53,7 +53,7 @@
             // 
             // bRecalibrate
             // 
-            this.bRecalibrate.Location = new System.Drawing.Point(592, 39);
+            this.bRecalibrate.Location = new System.Drawing.Point(671, 39);
             this.bRecalibrate.Name = "bRecalibrate";
             this.bRecalibrate.Size = new System.Drawing.Size(100, 23);
             this.bRecalibrate.TabIndex = 5;
@@ -65,7 +65,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(704, 391);
+            this.ClientSize = new System.Drawing.Size(810, 538);
             this.Controls.Add(this.bRecalibrate);
             this.Controls.Add(this.dataOutput);
             this.Controls.Add(this.imageBoxFrameGrabber);
