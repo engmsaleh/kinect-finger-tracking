@@ -157,12 +157,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\HandGestureRecognition.SkinDetector\HandGestureRecognition.SkinDetector.csproj">
-      <Project>{8B522B5D-7AFE-47B7-90BC-C9203374EA6D}</Project>
-      <Name>HandGestureRecognition.SkinDetector</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

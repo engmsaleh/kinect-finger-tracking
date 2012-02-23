@@ -30,6 +30,7 @@
         {
             this.imageBoxFrameGrabber = new Emgu.CV.UI.ImageBox();
             this.dataOutput = new System.Windows.Forms.TextBox();
+            this.bRecalibrate = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.imageBoxFrameGrabber)).BeginInit();
             this.SuspendLayout();
             // 
@@ -50,11 +51,22 @@
             this.dataOutput.TabIndex = 4;
             this.dataOutput.Text = "not watching";
             // 
+            // bRecalibrate
+            // 
+            this.bRecalibrate.Location = new System.Drawing.Point(592, 39);
+            this.bRecalibrate.Name = "bRecalibrate";
+            this.bRecalibrate.Size = new System.Drawing.Size(100, 23);
+            this.bRecalibrate.TabIndex = 5;
+            this.bRecalibrate.Text = "Recalibrate";
+            this.bRecalibrate.UseVisualStyleBackColor = true;
+            this.bRecalibrate.Click += new System.EventHandler(this.bRecalibrate_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(704, 391);
+            this.Controls.Add(this.bRecalibrate);
             this.Controls.Add(this.dataOutput);
             this.Controls.Add(this.imageBoxFrameGrabber);
             this.Name = "Form1";
@@ -69,6 +81,7 @@
 
         private Emgu.CV.UI.ImageBox imageBoxFrameGrabber;
         private System.Windows.Forms.TextBox dataOutput;
+        private System.Windows.Forms.Button bRecalibrate;
 
     }
 }
