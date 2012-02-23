@@ -73,7 +73,7 @@ namespace HandGestureRecognition
                     }
                 }*/
                 #endregion
-                /*int state = 0;
+                int state = 0;
                 if (movementContour != null)
                 {
                     MCvMoments mvMoments = movementContour.GetMoments();
@@ -81,12 +81,12 @@ namespace HandGestureRecognition
                     state = UpdateVectors(fingerNum, mvCenter);
                 }
                 else
-                    UpdateVectors(fingerNum, null);
+                    UpdateVectors(fingerNum, new MCvPoint2D64f());
                 UpdateCursor();
                 if (state == 1)
                 {
                     mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, Cursor.Position.X, Cursor.Position.Y, 0, 0);                    
-                }*/
+                }
 
                 UpdateVectors(fingerNum, new MCvPoint2D64f());
                 //UpdateCursor();
@@ -118,7 +118,7 @@ namespace HandGestureRecognition
                 {
                     avX += (int)point.X / pointsCount;
                     avY += (int)point.Y / pointsCount;
-                    if (Math.Abs(mvCenter.x - point.X) + Math.Abs(mvCenter.x - point.X) < 10)
+                    if (Math.Abs(mvCenter.x - point.X) + Math.Abs(mvCenter.x - point.X) < 10 && mvCenter.x != 0)
                         state = 1;
                 }
                 System.Drawing.Point newp = new System.Drawing.Point(avX, avY);
