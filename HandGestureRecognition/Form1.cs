@@ -108,7 +108,7 @@ namespace HandGestureRecognition
                         else
                             temp = pixelData[i] - pixelDataLast[i];
                         * */
-                        if (d <= 0 || Math.Abs(tableTemp) < 70 || d > 10000)
+                        if (d <= 0 || Math.Abs(tableTemp) < 50 || d > 10000)
                             temp = 0;
                         else
                             temp = MAX_INT16;

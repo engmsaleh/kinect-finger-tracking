@@ -24,12 +24,16 @@ namespace HandGestureRecognition
         Seq<PointF> latestPoints;
         Seq<PointF> stickyPoints;
         Contour<System.Drawing.Point> movementContour;
+        Vector victor, mrKalman;
+        Matrix<float> mouseState;
+        Matrix<float> measurement;
+
         Queue<int[]> vectors;
         System.Drawing.Point last;
         private float CURR_SEN;
         private int VECT_COUNT;
         bool watching;
-        Kalman kalman;
+        Kalman kf;
         
         //Cursor Variables
         System.Drawing.Point position;
@@ -37,18 +41,31 @@ namespace HandGestureRecognition
         public MouseDriver()
         {
             CURR_SEN = 20F;
-            VECT_COUNT = 4;
+            VECT_COUNT = 2;
             vectors = new Queue<int[]>(5);
             position = new System.Drawing.Point(0, 0);
             watching = false;
+
             float[,] tranisitionMatrix = {{1,0,1,0},{0,1,0,1},{0,0,1,0},{0,1,0,0}};
-            kalman = new Kalman(4, 2, 0);
-            kalman.TransitionMatrix = new Matrix<float>(tranisitionMatrix);
-            kalman.MeasurementMatrix.SetIdentity();
-            kalman.ProcessNoiseCovariance.SetIdentity(new MCvScalar(1e-4));
-            kalman.MeasurementNoiseCovariance.SetIdentity(new MCvScalar(1e-1));
-            kalman.ErrorCovariancePost.SetIdentity(new MCvScalar(.1));
-            //kalman.PredictedState.
+            float[,] predictedState = {{Cursor.Position.X,Cursor.Position.Y,0,0}};
+            kf = new Kalman(4, 2, 0);
+            Matrix<Int32> processNoise = new Matrix<Int32>(4, 1);
+            measurement = new Matrix<float>(2, 1);
+            measurement.SetValue(0);
+            mouseState = new Matrix<float>(predictedState);
+
+            kf.TransitionMatrix = new Matrix<float>(tranisitionMatrix);
+            kf.PredictedState = new Matrix<float>(predictedState);
+            kf.MeasurementMatrix.SetIdentity();
+            
+            kf.ProcessNoiseCovariance.SetIdentity(new MCvScalar(1e-4));
+            kf.MeasurementNoiseCovariance.SetIdentity(new MCvScalar(1e-1));
+            kf.ErrorCovariancePost.SetIdentity(new MCvScalar(.1));
+
+            victor.X = 0;
+            victor.Y = 0;
+            mrKalman.X = 0;
+            mrKalman.Y = 0;
         }
 
         public MouseDriver(Seq<PointF> points, int fingerNum, Contour<System.Drawing.Point> movementContour) : this()
@@ -98,8 +115,9 @@ namespace HandGestureRecognition
                 }*/
 
                 UpdateVectors(fingerNum, new MCvPoint2D64f());
-                //UpdateCursor();
+                UpdateCursor();
             }
+            
             return watching;
         }
 
@@ -132,32 +150,33 @@ namespace HandGestureRecognition
                 }
                 System.Drawing.Point newp = new System.Drawing.Point(avX, avY);
 
+                //work here
+                System.Drawing.Point statePt = new System.Drawing.Point((int)mouseState[0,0],(int)mouseState[0,1]);
+                Matrix<float> prediction = kf.Predict();
+                System.Drawing.Point predictPt = new System.Drawing.Point((int)prediction[0,0],(int)prediction[0,1]);
+                
+                measurement[0,0] = Cursor.Position.X;
+			    measurement[0,1] = Cursor.Position.Y;
+			
+			    victor.X = (int)measurement[0,0];
+			    victor.Y = (int)measurement[0,1];
+                Matrix<float> estimated = kf.Correct(measurement);
+
+			    mrKalman.X = (int)estimated[0,0];
+			    mrKalman.Y = (int)estimated[0,1];
+
+                victor.X = newp.X - last.X;
+                victor.Y = newp.Y - last.Y;
                 //If not the first point
-                if (last != null)
-                    vectors.Enqueue(new int[] {newp.X - last.X, newp.Y - last.Y });
                 last = newp;
-                if (vectors.Count > VECT_COUNT)
-                    vectors.Dequeue();
             }
             return state;
         }
 
         private void UpdateCursor()
         {
-            if (vectors.Count >= VECT_COUNT)
-            {
-                var itr = vectors.AsEnumerable();
-                int[] addvectors = new int[2];
-                position = Cursor.Position;
-
-                foreach (int[] victor in itr)
-                {
-                    addvectors[0] += victor[0];
-                    addvectors[1] += victor[1];
-                }
-
-                position.Offset((int)((addvectors[0] / VECT_COUNT) * CURR_SEN), (int)((addvectors[1] / VECT_COUNT) * CURR_SEN * -1));
-            }
+            position = Cursor.Position;
+            position.Offset((int)((mrKalman.X) * CURR_SEN), (int)((mrKalman.Y) * CURR_SEN * -1));
             Cursor.Position = position;
         }
     }
