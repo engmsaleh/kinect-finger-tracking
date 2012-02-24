@@ -212,12 +212,18 @@ namespace HandGestureRecognition
                         dPointList.Push(dpcpoint);
                     }
 
+                    PointF center;
+                    float radius;
+
                     PointF[] endpointarray = dPointList.ToArray();
+                    CvInvoke.cvMinEnclosingCircle(dPointList.Ptr, out center, out radius);
+
 
                     realendPointList = new Seq<PointF>(storage);
                     for (int i = 0; i < endpointarray.Length; i++)
                     {
-                        realendPointList.Push(dPointList[i]);
+                        if(endpointarray[i].Y > center.Y)
+                            realendPointList.Push(dPointList[i]);
                     }
 
                     // convert to depth pointF array
@@ -251,7 +257,7 @@ namespace HandGestureRecognition
                                                     (float)defectArray[i].DepthPoint.Y);
                     PointF endPoint = new PointF((float)defectArray[i].EndPoint.X,
                                                     (float)defectArray[i].EndPoint.Y);
-
+                    
                     LineSegment2D startDepthLine = new LineSegment2D(defectArray[i].StartPoint, defectArray[i].DepthPoint);
 
                     LineSegment2D depthEndLine = new LineSegment2D(defectArray[i].DepthPoint, defectArray[i].EndPoint);
@@ -282,10 +288,16 @@ namespace HandGestureRecognition
                         colorFrame.Draw(startCircle2, new Bgr(Color.Red), 2);
                     }
                 }
+                PointF[] endpointarr = realendPointList.ToArray();
+                for (int i = 0; i < endpointarr.Length; i++) {
+                    PointF realend = new PointF(endpointarr[i].X, endpointarr[i].Y);
+                    CircleF circEnd = new CircleF(realend, 5f);
+                    colorFrame.Draw(circEnd, new Bgr(Color.Yellow), 2);
+                }
             }
             #endregion
 
-            if(mouse.AddFrame(dPointList, fingerNum, shapeContour)) 
+            if (mouse.AddFrame(realendPointList, fingerNum, shapeContour)) 
                 dataOutput.Text = "watching";
             else
                 dataOutput.Text = "not watching";

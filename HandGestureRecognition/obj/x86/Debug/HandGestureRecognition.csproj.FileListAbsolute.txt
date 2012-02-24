@@ -230,3 +230,5 @@ C:\ft\HandGestureRecognition\obj\x86\Debug\GenerateResource.read.1.tlog
 C:\ft\HandGestureRecognition\obj\x86\Debug\GenerateResource.write.1.tlog
 C:\ft\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.exe
 C:\ft\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.pdb
+C:\ft\HandGestureRecognition\obj\x86\Debug\ResGen.read.1.tlog
+C:\ft\HandGestureRecognition\obj\x86\Debug\ResGen.write.1.tlog

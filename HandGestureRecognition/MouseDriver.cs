@@ -25,42 +25,35 @@ namespace HandGestureRecognition
         Seq<PointF> stickyPoints;
         Contour<System.Drawing.Point> movementContour;
         Vector victor, mrKalman;
-        Matrix<float> mouseState;
-        Matrix<float> measurement;
 
         Queue<int[]> vectors;
         System.Drawing.Point last;
         private float CURR_SEN;
-        private int VECT_COUNT;
         bool watching;
         Kalman kf;
+        SyntheticData kfData;
         
         //Cursor Variables
         System.Drawing.Point position;
 
         public MouseDriver()
         {
-            CURR_SEN = 20F;
-            VECT_COUNT = 2;
+            CURR_SEN = 8.5F;
             vectors = new Queue<int[]>(5);
             position = new System.Drawing.Point(0, 0);
             watching = false;
 
-            float[,] tranisitionMatrix = {{1,0,1,0},{0,1,0,1},{0,0,1,0},{0,1,0,0}};
-            float[,] predictedState = {{Cursor.Position.X,Cursor.Position.Y,0,0}};
-            kf = new Kalman(4, 2, 0);
-            Matrix<Int32> processNoise = new Matrix<Int32>(4, 1);
-            measurement = new Matrix<float>(2, 1);
-            measurement.SetValue(0);
-            mouseState = new Matrix<float>(predictedState);
+            #region initialize Kalman filter
+            kfData = new SyntheticData();
 
-            kf.TransitionMatrix = new Matrix<float>(tranisitionMatrix);
-            kf.PredictedState = new Matrix<float>(predictedState);
-            kf.MeasurementMatrix.SetIdentity();
-            
-            kf.ProcessNoiseCovariance.SetIdentity(new MCvScalar(1e-4));
-            kf.MeasurementNoiseCovariance.SetIdentity(new MCvScalar(1e-1));
-            kf.ErrorCovariancePost.SetIdentity(new MCvScalar(.1));
+            kf = new Kalman(4, 2, 0);
+            kf.TransitionMatrix = kfData.transitionMatrix;
+            kf.MeasurementMatrix = kfData.measurementMatrix;
+            kf.ProcessNoiseCovariance = kfData.processNoise;
+            kf.MeasurementNoiseCovariance = kfData.measurementNoise;
+            kf.ErrorCovariancePost = kfData.errorCovariancePost;
+            kf.CorrectedState = kfData.state; // stan
+            #endregion
 
             victor.X = 0;
             victor.Y = 0;
@@ -88,17 +81,6 @@ namespace HandGestureRecognition
             }
             if (watching)
             {
-                #region single point movement
-                /*if (points != null)
-                {
-                    PointF[] test = points.ToArray();
-                    if (test.Length > 0)
-                    {
-                        System.Drawing.Point posish = new System.Drawing.Point((int)test[0].X*3, (int)test[0].Y*3);
-                        Cursor.Position = posish;
-                    }
-                }*/
-                #endregion
                 /*int state = 0;
                 if (movementContour != null)
                 {
@@ -150,25 +132,22 @@ namespace HandGestureRecognition
                 }
                 System.Drawing.Point newp = new System.Drawing.Point(avX, avY);
 
-                //work here
-                System.Drawing.Point statePt = new System.Drawing.Point((int)mouseState[0,0],(int)mouseState[0,1]);
                 Matrix<float> prediction = kf.Predict();
-                System.Drawing.Point predictPt = new System.Drawing.Point((int)prediction[0,0],(int)prediction[0,1]);
+                PointF predictProint = new PointF(prediction[0, 0], prediction[1, 0]);
+                // The mouse input points.
+                PointF measurePoint = new PointF(kfData.GetMeasurement()[0, 0],
+                    kfData.GetMeasurement()[1, 0]);
+                Matrix<float> estimated = kf.Correct(kfData.GetMeasurement());
+                // The resulting point from the Kalman Filter.
+                System.Drawing.Point newpEst = new System.Drawing.Point((int)estimated[0, 0], (int)estimated[1, 0]);
+                    //PointF estPoint = new PointF(estimated[0, 0], estimated[1, 0]);
+                kfData.state[0, 0] = newp.X;
+                kfData.state[1, 0] = newp.Y;
                 
-                measurement[0,0] = Cursor.Position.X;
-			    measurement[0,1] = Cursor.Position.Y;
-			
-			    victor.X = (int)measurement[0,0];
-			    victor.Y = (int)measurement[0,1];
-                Matrix<float> estimated = kf.Correct(measurement);
+                mrKalman.X = newpEst.X - last.X;
+                mrKalman.Y = newpEst.Y - last.Y;
 
-			    mrKalman.X = (int)estimated[0,0];
-			    mrKalman.Y = (int)estimated[0,1];
-
-                victor.X = newp.X - last.X;
-                victor.Y = newp.Y - last.Y;
-                //If not the first point
-                last = newp;
+                last = newpEst;
             }
             return state;
         }
@@ -178,6 +157,7 @@ namespace HandGestureRecognition
             position = Cursor.Position;
             position.Offset((int)((mrKalman.X) * CURR_SEN), (int)((mrKalman.Y) * CURR_SEN * -1));
             Cursor.Position = position;
+            kfData.GoToNextState();
         }
     }
 }

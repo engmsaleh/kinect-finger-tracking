@@ -118,6 +118,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SyntheticData.cs" />
     <Compile Include="MouseDriver.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
