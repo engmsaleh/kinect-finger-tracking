@@ -29,6 +29,7 @@ namespace HandGestureRecognition
         private float CURR_SEN;
         private int VECT_COUNT;
         bool watching;
+        Kalman kalman;
         
         //Cursor Variables
         System.Drawing.Point position;
@@ -40,6 +41,14 @@ namespace HandGestureRecognition
             vectors = new Queue<int[]>(5);
             position = new System.Drawing.Point(0, 0);
             watching = false;
+            float[,] tranisitionMatrix = {{1,0,1,0},{0,1,0,1},{0,0,1,0},{0,1,0,0}};
+            kalman = new Kalman(4, 2, 0);
+            kalman.TransitionMatrix = new Matrix<float>(tranisitionMatrix);
+            kalman.MeasurementMatrix.SetIdentity();
+            kalman.ProcessNoiseCovariance.SetIdentity(new MCvScalar(1e-4));
+            kalman.MeasurementNoiseCovariance.SetIdentity(new MCvScalar(1e-1));
+            kalman.ErrorCovariancePost.SetIdentity(new MCvScalar(.1));
+            //kalman.PredictedState.
         }
 
         public MouseDriver(Seq<PointF> points, int fingerNum, Contour<System.Drawing.Point> movementContour) : this()
@@ -73,7 +82,7 @@ namespace HandGestureRecognition
                     }
                 }*/
                 #endregion
-                int state = 0;
+                /*int state = 0;
                 if (movementContour != null)
                 {
                     MCvMoments mvMoments = movementContour.GetMoments();
@@ -86,7 +95,7 @@ namespace HandGestureRecognition
                 if (state == 1)
                 {
                     mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, Cursor.Position.X, Cursor.Position.Y, 0, 0);                    
-                }
+                }*/
 
                 UpdateVectors(fingerNum, new MCvPoint2D64f());
                 //UpdateCursor();
