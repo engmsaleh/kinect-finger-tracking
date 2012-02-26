@@ -58,6 +58,7 @@ namespace HandGestureRecognition
             foreach (KinectSensor kinect in KinectSensor.KinectSensors)
             {
                 kinect.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
+                kinect.DepthStream.Range = (DepthRange)1;
                 kinect.Start();
                 kinect.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(DepthImageReady);
             }
