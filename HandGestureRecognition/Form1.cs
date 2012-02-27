@@ -24,13 +24,16 @@ namespace HandGestureRecognition
 
         int frameWidth;
         int frameHeight;
+        int cropWidth;
+        int cropHeight;
         private short[] tableData;
         private short[] pixelData;
         private short[] pixelDataLast;
         private byte[] depthFrame32;
         bool recalibrate;
 
-        Kalman kalman;
+        int thickness;
+        int buffer;
 
         Seq<Point> hull;
         Seq<Point> filteredHull;
@@ -53,6 +56,9 @@ namespace HandGestureRecognition
             mouse = new MouseDriver();
             MAX_INT32 = Int32.MaxValue;
             MAX_INT16 = Int16.MaxValue;
+            thickness = 100;
+            cropWidth = 480;
+            cropHeight = 360;
             recalibrate = true;
             // show status for each sensor that is found now.
             foreach (KinectSensor kinect in KinectSensor.KinectSensors)
@@ -70,6 +76,24 @@ namespace HandGestureRecognition
             cal.CopyPixelDataTo(this.tableData);
         }
 
+        private short[] trimImage(DepthImageFrame frame)
+        {
+            int pixeldatalength = frame.PixelDataLength;
+            short[] pixels = new short[pixeldatalength];
+            short[] newImagePixels = new short[153600];
+            frame.CopyPixelDataTo(pixels);
+            int newIndex = 0;
+            for (int x = 0; x < (640 * 320); x++)
+            {
+                if (x % 640 > 80 && x % 640 <= 560)
+                {
+                    newImagePixels[newIndex] = pixels[x];
+                    newIndex++;
+                }
+            }
+            return newImagePixels;
+        }
+
         void DepthImageReady(object sender, DepthImageFrameReadyEventArgs e)
         {
             using (DepthImageFrame imageFrame = e.OpenDepthImageFrame())
@@ -82,8 +106,8 @@ namespace HandGestureRecognition
                         frameHeight = imageFrame.Height;
                         pixelData = new short[imageFrame.PixelDataLength];
                         depthFrame32 = new byte[frameWidth * frameHeight * 4];
-                        currentFrame = new Image<Gray, Int16>(frameWidth, frameHeight, new Gray(0));
-                        movement = new Image<Gray, byte>(frameWidth, frameHeight, new Gray(0));
+                        currentFrame = new Image<Gray, Int16>(cropWidth, cropHeight, new Gray(0));
+                        movement = new Image<Gray, byte>(cropWidth, cropHeight, new Gray(0));
                         pixelDataLast = new short[imageFrame.PixelDataLength];
                     }
                     if (recalibrate)
@@ -109,15 +133,26 @@ namespace HandGestureRecognition
                         else
                             temp = pixelData[i] - pixelDataLast[i];
                         * */
-                        if (d <= 0 || Math.Abs(tableTemp) < 50 || d > 10000)
-                            temp = 0;
-                        else
-                            temp = MAX_INT16;
-                        if (d >= 0 && Math.Abs(moveCalc) > 75 && d < 10000)
+
+                        if (thisX % 640 > (frameWidth - cropWidth) / 2 && thisX % 640 < frameWidth - (frameWidth - cropWidth) / 2 && thisY < cropHeight)
+                        {
+                            if (d <= 0 || Math.Abs(tableTemp) < 50 || d > 10000)
+                                temp = 0;
+                            else
+                                temp = MAX_INT32;
+                            if (d <= 0 || Math.Abs(tableTemp) < 50 || d < tableData[i] - thickness)
+                                moveData[thisY, thisX-80, 0] = 0;
+                            else
+                                moveData[thisY, thisX-80, 0] = 255;
+
+                            frameData[thisY, thisX-80, 0] = (short)temp;
+                        }
+
+
+                        /*if (d >= 0 && Math.Abs(moveCalc) > 75 && d < 10000)
                             moveData[thisY, thisX, 0] = 255;
                         else
-                            moveData[thisY, thisX, 0] = 0;
-                        frameData[thisY, thisX, 0] = (short)temp;
+                            moveData[thisY, thisX, 0] = 0;*/
                     }
                     pixelDataLast = (short[])pixelData.Clone();
 
@@ -173,7 +208,7 @@ namespace HandGestureRecognition
                     Contour<Point> currentContour = biggestContour.ApproxPoly(biggestContour.Perimeter * 0.0025, storage);
                     currentFrame.Draw(currentContour, new Gray(MAX_INT32), 2);
                     biggestContour = currentContour;
-
+                    
 
                     hull = biggestContour.GetConvexHull(Emgu.CV.CvEnum.ORIENTATION.CV_CLOCKWISE);
                     box = biggestContour.GetMinAreaRect();

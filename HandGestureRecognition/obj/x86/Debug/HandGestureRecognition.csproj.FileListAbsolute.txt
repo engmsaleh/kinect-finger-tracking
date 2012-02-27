@@ -129,8 +129,6 @@ C:\Nontic\HandGestureRecognition\bin\Debug\HandGestureRecognition.pdb
 C:\Nontic\HandGestureRecognition\bin\Debug\Emgu.CV.dll
 C:\Nontic\HandGestureRecognition\bin\Debug\Emgu.CV.UI.dll
 C:\Nontic\HandGestureRecognition\bin\Debug\Emgu.Util.dll
-C:\Nontic\HandGestureRecognition\bin\Debug\HandGestureRecognition.SkinDetector.dll
-C:\Nontic\HandGestureRecognition\bin\Debug\HandGestureRecognition.SkinDetector.pdb
 C:\Nontic\HandGestureRecognition\obj\x86\Debug\ResolveAssemblyReference.cache
 C:\Nontic\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.Form1.resources
 C:\Nontic\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.Properties.Resources.resources
@@ -232,3 +230,9 @@ C:\ft\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.exe
 C:\ft\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.pdb
 C:\ft\HandGestureRecognition\obj\x86\Debug\ResGen.read.1.tlog
 C:\ft\HandGestureRecognition\obj\x86\Debug\ResGen.write.1.tlog
+C:\Nontic\HandGestureRecognition\bin\Debug\opencv_core231.dll
+C:\Nontic\HandGestureRecognition\bin\Debug\opencv_imgproc231.dll
+C:\Nontic\HandGestureRecognition\bin\Debug\opencv_video231.dll
+C:\nontic2\HandGestureRecognition\bin\Debug\HandGestureRecognition.exe.config
+C:\nontic2\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.exe
+C:\nontic2\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.pdb
