@@ -31,6 +31,7 @@
             this.imageBoxFrameGrabber = new Emgu.CV.UI.ImageBox();
             this.dataOutput = new System.Windows.Forms.TextBox();
             this.bRecalibrate = new System.Windows.Forms.Button();
+            this.testBox = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.imageBoxFrameGrabber)).BeginInit();
             this.SuspendLayout();
             // 
@@ -53,7 +54,7 @@
             // 
             // bRecalibrate
             // 
-            this.bRecalibrate.Location = new System.Drawing.Point(671, 39);
+            this.bRecalibrate.Location = new System.Drawing.Point(671, 65);
             this.bRecalibrate.Name = "bRecalibrate";
             this.bRecalibrate.Size = new System.Drawing.Size(100, 23);
             this.bRecalibrate.TabIndex = 5;
@@ -61,11 +62,19 @@
             this.bRecalibrate.UseVisualStyleBackColor = true;
             this.bRecalibrate.Click += new System.EventHandler(this.bRecalibrate_Click);
             // 
+            // testBox
+            // 
+            this.testBox.Location = new System.Drawing.Point(671, 38);
+            this.testBox.Name = "testBox";
+            this.testBox.Size = new System.Drawing.Size(100, 20);
+            this.testBox.TabIndex = 6;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(810, 538);
+            this.Controls.Add(this.testBox);
             this.Controls.Add(this.bRecalibrate);
             this.Controls.Add(this.dataOutput);
             this.Controls.Add(this.imageBoxFrameGrabber);
@@ -82,6 +91,7 @@
         private Emgu.CV.UI.ImageBox imageBoxFrameGrabber;
         private System.Windows.Forms.TextBox dataOutput;
         private System.Windows.Forms.Button bRecalibrate;
+        private System.Windows.Forms.TextBox testBox;
 
     }
 }

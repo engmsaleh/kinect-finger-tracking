@@ -20,7 +20,7 @@ namespace HandGestureRecognition
         Image<Gray, byte> movement;
         Image<Bgr, byte> colorFrame;
         MouseDriver mouse;
-        Contour<Point> shapeContour;
+        ArrayList touchPoints;
 
         int frameWidth;
         int frameHeight;
@@ -56,6 +56,7 @@ namespace HandGestureRecognition
             mouse = new MouseDriver();
             MAX_INT32 = Int32.MaxValue;
             MAX_INT16 = Int16.MaxValue;
+            touchPoints = new ArrayList();
             thickness = 100;
             cropWidth = 480;
             cropHeight = 360;
@@ -136,11 +137,11 @@ namespace HandGestureRecognition
 
                         if (thisX % 640 > (frameWidth - cropWidth) / 2 && thisX % 640 < frameWidth - (frameWidth - cropWidth) / 2 && thisY < cropHeight)
                         {
-                            if (d <= 0 || Math.Abs(tableTemp) < 50 || d > 10000)
+                            if (d <= 0 || Math.Abs(tableTemp) < 50 || d > 6000)
                                 temp = 0;
                             else
                                 temp = MAX_INT32;
-                            if (d <= 0 || Math.Abs(tableTemp) < 50 || d < tableData[i] - thickness)
+                            if (d <= 0 || Math.Abs(tableTemp) < 40 || d < tableData[i] - thickness || d > 6000)
                                 moveData[thisY, thisX-80, 0] = 0;
                             else
                                 moveData[thisY, thisX-80, 0] = 255;
@@ -157,7 +158,7 @@ namespace HandGestureRecognition
                     pixelDataLast = (short[])pixelData.Clone();
 
                     Image<Gray, byte> cFrameByte = currentFrame.Convert<byte>(delegate(short b) { return (byte)(b >> 8); });
-                    colorFrame = cFrameByte.Convert<Bgr, byte>();
+                    colorFrame = movement.Convert<Bgr, byte>();
 
                     if(ExtractContourAndHull(cFrameByte))
                         DrawAndComputeFingersNum();
@@ -189,19 +190,21 @@ namespace HandGestureRecognition
                 Contour<Point> mvContours = movement.FindContours(Emgu.CV.CvEnum.CHAIN_APPROX_METHOD.CV_CHAIN_APPROX_SIMPLE, Emgu.CV.CvEnum.RETR_TYPE.CV_RETR_LIST, storage);
                 Contour<Point> biggestMovement = null;
                 Result2 = 0;
+                touchPoints.Clear();
                 while (mvContours != null)
                 {
                     Result1 = mvContours.Area;
-                    if (Result1 > 150 && Result1 > Result2)
+                    if (Result1 > 40)
                     {
                         Result2 = Result1;
                         biggestMovement = mvContours.ApproxPoly(mvContours.Perimeter * 0.0025, storage);
                         colorFrame.Draw(biggestMovement, new Bgr(0, 0, 255), 2);
+                        MCvMoments shpMoments = mvContours.GetMoments();
+                        touchPoints.Add(new Point((int)shpMoments.GravityCenter.x,(int)shpMoments.GravityCenter.y));
                     }
                     mvContours = mvContours.HNext;
                 }
                 mvContours = null;
-                shapeContour = biggestMovement;
 
                 if (biggestContour != null)
                 {
@@ -333,10 +336,11 @@ namespace HandGestureRecognition
             }
             #endregion
 
-            if (mouse.AddFrame(realendPointList, fingerNum, shapeContour)) 
+            if (mouse.AddFrame(realendPointList, fingerNum, touchPoints)) 
                 dataOutput.Text = "watching";
             else
                 dataOutput.Text = "not watching";
+            testBox.Text = touchPoints.Count.ToString();
 
             MCvFont font = new MCvFont(Emgu.CV.CvEnum.FONT.CV_FONT_HERSHEY_DUPLEX, 5d, 5d);
             colorFrame.Draw(fingerNum.ToString(), ref font, new Point(50, 150), new Bgr(255, 10, 10));
