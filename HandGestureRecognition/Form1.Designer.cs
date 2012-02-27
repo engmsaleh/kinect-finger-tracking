@@ -32,6 +32,7 @@
             this.dataOutput = new System.Windows.Forms.TextBox();
             this.bRecalibrate = new System.Windows.Forms.Button();
             this.testBox = new System.Windows.Forms.TextBox();
+            this.mouseKeyEventProvider1 = new MouseKeyboardActivityMonitor.Controls.MouseKeyEventProvider();
             ((System.ComponentModel.ISupportInitialize)(this.imageBoxFrameGrabber)).BeginInit();
             this.SuspendLayout();
             // 
@@ -69,6 +70,11 @@
             this.testBox.Size = new System.Drawing.Size(100, 20);
             this.testBox.TabIndex = 6;
             // 
+            // mouseKeyEventProvider1
+            // 
+            this.mouseKeyEventProvider1.Enabled = true;
+            this.mouseKeyEventProvider1.HookType = MouseKeyboardActivityMonitor.Controls.HookType.Global;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -92,6 +98,7 @@
         private System.Windows.Forms.TextBox dataOutput;
         private System.Windows.Forms.Button bRecalibrate;
         private System.Windows.Forms.TextBox testBox;
+        private MouseKeyboardActivityMonitor.Controls.MouseKeyEventProvider mouseKeyEventProvider1;
 
     }
 }

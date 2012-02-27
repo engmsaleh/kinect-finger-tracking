@@ -20,15 +20,19 @@ namespace HandGestureRecognition
         Image<Gray, byte> movement;
         Image<Bgr, byte> colorFrame;
         MouseDriver mouse;
-        Contour<Point> shapeContour;
+        ArrayList touchPoints;
 
         int frameWidth;
         int frameHeight;
+        int cropWidth;
+        int cropHeight;
         private short[] tableData;
         private short[] pixelData;
         private short[] pixelDataLast;
         private byte[] depthFrame32;
         bool recalibrate;
+
+        int thickness;
 
         Seq<Point> hull;
         Seq<Point> filteredHull;
@@ -37,7 +41,6 @@ namespace HandGestureRecognition
         MCvBox2D box;
 
         Int32 MAX_INT32;
-        Int32 MAX_INT16;
 
 
         //eddie
@@ -50,7 +53,10 @@ namespace HandGestureRecognition
             box = new MCvBox2D();
             mouse = new MouseDriver();
             MAX_INT32 = Int32.MaxValue;
-            MAX_INT16 = Int16.MaxValue;
+            touchPoints = new ArrayList();
+            thickness = 100;
+            cropWidth = 480;
+            cropHeight = 360;
             recalibrate = true;
             // show status for each sensor that is found now.
             foreach (KinectSensor kinect in KinectSensor.KinectSensors)
@@ -68,6 +74,24 @@ namespace HandGestureRecognition
             cal.CopyPixelDataTo(this.tableData);
         }
 
+        private short[] trimImage(DepthImageFrame frame)
+        {
+            int pixeldatalength = frame.PixelDataLength;
+            short[] pixels = new short[pixeldatalength];
+            short[] newImagePixels = new short[153600];
+            frame.CopyPixelDataTo(pixels);
+            int newIndex = 0;
+            for (int x = 0; x < (640 * 320); x++)
+            {
+                if (x % 640 > 80 && x % 640 <= 560)
+                {
+                    newImagePixels[newIndex] = pixels[x];
+                    newIndex++;
+                }
+            }
+            return newImagePixels;
+        }
+
         void DepthImageReady(object sender, DepthImageFrameReadyEventArgs e)
         {
             using (DepthImageFrame imageFrame = e.OpenDepthImageFrame())
@@ -80,8 +104,8 @@ namespace HandGestureRecognition
                         frameHeight = imageFrame.Height;
                         pixelData = new short[imageFrame.PixelDataLength];
                         depthFrame32 = new byte[frameWidth * frameHeight * 4];
-                        currentFrame = new Image<Gray, Int16>(frameWidth, frameHeight, new Gray(0));
-                        movement = new Image<Gray, byte>(frameWidth, frameHeight, new Gray(0));
+                        currentFrame = new Image<Gray, Int16>(cropWidth, cropHeight, new Gray(0));
+                        movement = new Image<Gray, byte>(cropWidth, cropHeight, new Gray(0));
                         pixelDataLast = new short[imageFrame.PixelDataLength];
                     }
                     if (recalibrate)
@@ -107,20 +131,31 @@ namespace HandGestureRecognition
                         else
                             temp = pixelData[i] - pixelDataLast[i];
                         * */
-                        if (d <= 0 || Math.Abs(tableTemp) < 50 || d > 10000)
-                            temp = 0;
-                        else
-                            temp = MAX_INT16;
-                        if (d >= 0 && Math.Abs(moveCalc) > 75 && d < 10000)
+
+                        if (thisX % 640 > (frameWidth - cropWidth) / 2 && thisX % 640 < frameWidth - (frameWidth - cropWidth) / 2 && thisY < cropHeight)
+                        {
+                            if (d <= 0 || Math.Abs(tableTemp) < 50 || d > 6000)
+                                temp = 0;
+                            else
+                                temp = MAX_INT32;
+                            if (d <= 0 || Math.Abs(tableTemp) < 40 || d < tableData[i] - thickness || d > 6000)
+                                moveData[thisY, thisX-80, 0] = 0;
+                            else
+                                moveData[thisY, thisX-80, 0] = 255;
+
+                            frameData[thisY, thisX-80, 0] = (short)temp;
+                        }
+
+
+                        /*if (d >= 0 && Math.Abs(moveCalc) > 75 && d < 10000)
                             moveData[thisY, thisX, 0] = 255;
                         else
-                            moveData[thisY, thisX, 0] = 0;
-                        frameData[thisY, thisX, 0] = (short)temp;
+                            moveData[thisY, thisX, 0] = 0;*/
                     }
                     pixelDataLast = (short[])pixelData.Clone();
 
                     Image<Gray, byte> cFrameByte = currentFrame.Convert<byte>(delegate(short b) { return (byte)(b >> 8); });
-                    colorFrame = cFrameByte.Convert<Bgr, byte>();
+                    colorFrame = movement.Convert<Bgr, byte>();
 
                     if(ExtractContourAndHull(cFrameByte))
                         DrawAndComputeFingersNum();
@@ -152,26 +187,28 @@ namespace HandGestureRecognition
                 Contour<Point> mvContours = movement.FindContours(Emgu.CV.CvEnum.CHAIN_APPROX_METHOD.CV_CHAIN_APPROX_SIMPLE, Emgu.CV.CvEnum.RETR_TYPE.CV_RETR_LIST, storage);
                 Contour<Point> biggestMovement = null;
                 Result2 = 0;
+                touchPoints.Clear();
                 while (mvContours != null)
                 {
                     Result1 = mvContours.Area;
-                    if (Result1 > 150 && Result1 > Result2)
+                    if (Result1 > 40)
                     {
                         Result2 = Result1;
                         biggestMovement = mvContours.ApproxPoly(mvContours.Perimeter * 0.0025, storage);
                         colorFrame.Draw(biggestMovement, new Bgr(0, 0, 255), 2);
+                        MCvMoments shpMoments = mvContours.GetMoments();
+                        touchPoints.Add(new Point((int)shpMoments.GravityCenter.x,(int)shpMoments.GravityCenter.y));
                     }
                     mvContours = mvContours.HNext;
                 }
                 mvContours = null;
-                shapeContour = biggestMovement;
 
                 if (biggestContour != null)
                 {
                     Contour<Point> currentContour = biggestContour.ApproxPoly(biggestContour.Perimeter * 0.0025, storage);
                     currentFrame.Draw(currentContour, new Gray(MAX_INT32), 2);
                     biggestContour = currentContour;
-
+                    
 
                     hull = biggestContour.GetConvexHull(Emgu.CV.CvEnum.ORIENTATION.CV_CLOCKWISE);
                     box = biggestContour.GetMinAreaRect();
@@ -296,10 +333,11 @@ namespace HandGestureRecognition
             }
             #endregion
 
-            if (mouse.AddFrame(realendPointList, fingerNum, shapeContour)) 
+            if (mouse.AddFrame(realendPointList, fingerNum, touchPoints)) 
                 dataOutput.Text = "watching";
             else
                 dataOutput.Text = "not watching";
+            testBox.Text = touchPoints.Count.ToString();
 
             MCvFont font = new MCvFont(Emgu.CV.CvEnum.FONT.CV_FONT_HERSHEY_DUPLEX, 5d, 5d);
             colorFrame.Draw(fingerNum.ToString(), ref font, new Point(50, 150), new Bgr(255, 10, 10));

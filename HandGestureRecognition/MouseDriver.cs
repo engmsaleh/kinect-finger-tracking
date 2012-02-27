@@ -9,22 +9,30 @@ using Emgu.CV;
 using System.Windows.Forms;
 using System.Windows;
 using System.Runtime.InteropServices;
+using MouseKeyboardActivityMonitor;
+using MouseKeyboardActivityMonitor.WinApi;
 
 namespace HandGestureRecognition
 {
     class MouseDriver
     {
+        KeyboardHookListener keyboard;
+        UIntPtr dwExtraInfo;
         [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
-        public static extern void mouse_event(long dwFlags, long dx, long dy, long cButtons, long dwExtraInfo);
+        static extern void mouse_event(uint dwFlags, uint dx, uint dy,
+        uint dwData, UIntPtr dwExtraInfo);
+
         private const int MOUSEEVENTF_LEFTDOWN = 0x02;
         private const int MOUSEEVENTF_LEFTUP = 0x04;
         private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
         private const int MOUSEEVENTF_RIGHTUP = 0x10;
+        delegate void KeyHandler(object source, KeyEventArgs arg);
+        bool clicking;
 
-        Seq<PointF> latestPoints;
-        Seq<PointF> stickyPoints;
-        Contour<System.Drawing.Point> movementContour;
         Vector victor, mrKalman;
+        int[,,] pointSet;
+        int pointSetPointer;
+        int pointCount;
 
         Queue<int[]> vectors;
         System.Drawing.Point last;
@@ -38,13 +46,17 @@ namespace HandGestureRecognition
 
         public MouseDriver()
         {
-            CURR_SEN = 4F;
+            CURR_SEN = 6.5F;
             vectors = new Queue<int[]>(5);
             position = new System.Drawing.Point(0, 0);
             watching = false;
+            pointSet = new int[5,3,16];
+            pointSetPointer = pointCount = 0;
+            clicking = false;
 
             #region initialize Kalman filter
             kfData = new SyntheticData();
+            keyboard = new KeyboardHookListener(new GlobalHooker());
 
             kf = new Kalman(4, 2, 0);
             kf.TransitionMatrix = kfData.transitionMatrix;
@@ -61,48 +73,47 @@ namespace HandGestureRecognition
             mrKalman.Y = 0;
         }
 
-        public MouseDriver(Seq<PointF> points, int fingerNum, Contour<System.Drawing.Point> movementContour) : this()
+        public MouseDriver(Seq<PointF> points, int fingerNum, ArrayList touchPoints) : this()
         {
-            AddFrame(points, fingerNum, movementContour);
+            AddFrame(points, fingerNum, touchPoints);
         }
 
-        public bool AddFrame(Seq<PointF> points, int fingerNum, Contour<System.Drawing.Point> movementContour) 
+        public bool AddFrame(Seq<PointF> points, int fingerNum, ArrayList touchPoints) 
         {
-            latestPoints = points; 
-
-            if (fingerNum > 4)
+            if (touchPoints.Count >= 1)
             {
                 watching = true;
-                stickyPoints = latestPoints;
             }
-            else if (fingerNum < 1)
+            else if (touchPoints.Count < 1)
             {
                 watching = false;
             }
-            if (watching)
+            /*int state = 0;
+            if (movementContour != null)
             {
-                /*int state = 0;
-                if (movementContour != null)
-                {
-                    MCvMoments mvMoments = movementContour.GetMoments();
-                    MCvPoint2D64f mvCenter = mvMoments.GravityCenter;
-                    state = UpdateVectors(fingerNum, mvCenter);
-                }
-                else
-                    UpdateVectors(fingerNum, new MCvPoint2D64f());
-                UpdateCursor();
-                if (state == 1)
-                {
-                    mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, Cursor.Position.X, Cursor.Position.Y, 0, 0);                    
-                }*/
+                MCvMoments mvMoments = movementContour.GetMoments();
+                MCvPoint2D64f mvCenter = mvMoments.GravityCenter;
+                state = UpdateVectors(fingerNum, mvCenter);
+            }
+            else
+                UpdateVectors(fingerNum, new MCvPoint2D64f());
+            UpdateCursor();
+            if (state == 1)
+            {
+                mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, Cursor.Position.X, Cursor.Position.Y, 0, 0);                    
+            }*/
 
-                int state = UpdateVectors(fingerNum, new MCvPoint2D64f());
-                UpdateCursor();
+            int state = UpdateVectors(watching, touchPoints, touchPoints.Count);
 
-                if (state == 1)
-                {
-                    //click
-                }
+
+            if (touchPoints.Count < 2 )
+            {
+                clicking = false;
+            }
+            if (touchPoints.Count == 2 && !clicking)
+            {
+                clicking = true;
+                mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, (uint)Cursor.Position.X, (uint)Cursor.Position.Y, 0, dwExtraInfo);
             }
             
             return watching;
@@ -119,42 +130,71 @@ namespace HandGestureRecognition
             return 0;
         }*/
 
-        private int UpdateVectors(int fingerNum, MCvPoint2D64f mvCenter)
+        private int UpdateVectors(bool watching, ArrayList touchPoints, int fingerToUse)
         {
             int state = 0;
-            if (latestPoints != null)
+            if (touchPoints.Count > 0)
             {
-                //Determine average X and Y of most recent point
-                int avX = 0;
-                int avY = 0;
-                int pointsCount = latestPoints.Total;
-                foreach (PointF point in latestPoints)
+                #region process the point history
+                /*int index = 0;
+                foreach (System.Drawing.Point each in touchPoints) // put the points into the current "frame"
                 {
-                    avX += (int)point.X / pointsCount;
-                    avY += (int)point.Y / pointsCount;
-                    if (Math.Abs(mvCenter.x - point.X) + Math.Abs(mvCenter.x - point.X) < 10 && mvCenter.x != 0)
-                        state = 1;
+                    pointSet[index, 0, pointSetPointer] = ((System.Drawing.Point)touchPoints[index]).X;
+                    pointSet[index, 1, pointSetPointer] = ((System.Drawing.Point)touchPoints[index]).Y;
+                    index++;
                 }
-                System.Drawing.Point newp = new System.Drawing.Point(avX, avY);
+                if (pointCount < pointSet.GetLength(2) - 1)
+                    pointCount++;
+                if (pointSetPointer < pointSet.GetLength(2) - 1)
+                    pointSetPointer++;
+                else
+                    pointSetPointer = 1;
 
-                #region kalman processing
-                Matrix<float> prediction = kf.Predict();
-                PointF predictProint = new PointF(prediction[0, 0], prediction[1, 0]);
-                // The mouse input points.
-                PointF measurePoint = new PointF(kfData.GetMeasurement()[0, 0],
-                    kfData.GetMeasurement()[1, 0]);
-                Matrix<float> estimated = kf.Correct(kfData.GetMeasurement());
-                // The resulting point from the Kalman Filter.
-                System.Drawing.Point newpEst = new System.Drawing.Point((int)estimated[0, 0], (int)estimated[1, 0]);
-                    //PointF estPoint = new PointF(estimated[0, 0], estimated[1, 0]);
-                kfData.state[0, 0] = newp.X;
-                kfData.state[1, 0] = newp.Y;
-                
-                mrKalman.X = newpEst.X - last.X;
-                mrKalman.Y = newpEst.Y - last.Y;
+                if (pointSetPointer != 0)
+                {
+                    for (index = pointSetPointer; (index == 0 && pointCount == 1) || index > 0; index--)
+                    {
+                        SortedList<int,int[]> closests = new SortedList<int, int[]>();
+                        for (int c_points = pointSet.GetLength(0) - 1; c_points >= 0; c_points--)
+                        {
+                            for (int p_points = pointSet.GetLength(0) - 1; p_points >= 0; p_points--)
+                            {
+                            }
+                            System.Drawing.Point currPoint = (System.Drawing.Point)touchPoints[i_points];
+                            int dist = 
+                            closests.Add(
+                        }
+                    }
+                }*/
                 #endregion
+                System.Drawing.Point newp = (System.Drawing.Point)touchPoints[fingerToUse - 1];
 
-                last = newpEst;
+                if (watching && !clicking)
+                {
+                    Matrix<float> prediction = kf.Predict();
+                    PointF predictProint = new PointF(prediction[0, 0], prediction[1, 0]);
+                    // The mouse input points.
+                    PointF measurePoint = new PointF(kfData.GetMeasurement()[0, 0],
+                        kfData.GetMeasurement()[1, 0]);
+                    Matrix<float> estimated = kf.Correct(kfData.GetMeasurement());
+                    // The resulting point from the Kalman Filter.
+                    System.Drawing.Point newpEst = new System.Drawing.Point((int)estimated[0, 0], (int)estimated[1, 0]);
+                    kfData.state[0, 0] = newp.X;
+                    kfData.state[1, 0] = newp.Y;
+
+                    mrKalman.X = newpEst.X - last.X;
+                    mrKalman.Y = newpEst.Y - last.Y;
+                    UpdateCursor();
+                    last = newpEst;
+                }
+                else
+                {
+                    kf.CorrectedState = kfData.state; // stan
+                    mrKalman.X = 0;
+                    mrKalman.Y = 0;
+                    last = newp;
+                }
+
             }
             return state;
         }
