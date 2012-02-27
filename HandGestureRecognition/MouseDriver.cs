@@ -23,8 +23,8 @@ namespace HandGestureRecognition
 
         Seq<PointF> latestPoints;
         Seq<PointF> stickyPoints;
+        Contour<System.Drawing.Point> movementContour;
         Vector victor, mrKalman;
-        int[,] pointGrid;
 
         Queue<int[]> vectors;
         System.Drawing.Point last;
@@ -38,11 +38,10 @@ namespace HandGestureRecognition
 
         public MouseDriver()
         {
-            CURR_SEN = 5.5F;
+            CURR_SEN = 4F;
             vectors = new Queue<int[]>(5);
             position = new System.Drawing.Point(0, 0);
             watching = false;
-            pointGrid = new int[48,32];
 
             #region initialize Kalman filter
             kfData = new SyntheticData();
@@ -62,45 +61,48 @@ namespace HandGestureRecognition
             mrKalman.Y = 0;
         }
 
-        public MouseDriver(Seq<PointF> points, int fingerNum, ArrayList touchPoints) : this()
+        public MouseDriver(Seq<PointF> points, int fingerNum, Contour<System.Drawing.Point> movementContour) : this()
         {
-            AddFrame(points, fingerNum, touchPoints);
+            AddFrame(points, fingerNum, movementContour);
         }
 
-        public bool AddFrame(Seq<PointF> points, int fingerNum, ArrayList touchPoints) 
+        public bool AddFrame(Seq<PointF> points, int fingerNum, Contour<System.Drawing.Point> movementContour) 
         {
-            latestPoints = points;
+            latestPoints = points; 
 
-            if (touchPoints.Count >= 2)
+            if (fingerNum > 4)
             {
                 watching = true;
                 stickyPoints = latestPoints;
             }
-            else if (touchPoints.Count <= 1)
+            else if (fingerNum < 1)
             {
                 watching = false;
             }
-            /*int state = 0;
-            if (movementContour != null)
+            if (watching)
             {
-                MCvMoments mvMoments = movementContour.GetMoments();
-                MCvPoint2D64f mvCenter = mvMoments.GravityCenter;
-                state = UpdateVectors(fingerNum, mvCenter);
-            }
-            else
-                UpdateVectors(fingerNum, new MCvPoint2D64f());
-            UpdateCursor();
-            if (state == 1)
-            {
-                mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, Cursor.Position.X, Cursor.Position.Y, 0, 0);                    
-            }*/
+                /*int state = 0;
+                if (movementContour != null)
+                {
+                    MCvMoments mvMoments = movementContour.GetMoments();
+                    MCvPoint2D64f mvCenter = mvMoments.GravityCenter;
+                    state = UpdateVectors(fingerNum, mvCenter);
+                }
+                else
+                    UpdateVectors(fingerNum, new MCvPoint2D64f());
+                UpdateCursor();
+                if (state == 1)
+                {
+                    mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, Cursor.Position.X, Cursor.Position.Y, 0, 0);                    
+                }*/
 
-            int state = UpdateVectors(watching, touchPoints);
-            UpdateCursor();
+                int state = UpdateVectors(fingerNum, new MCvPoint2D64f());
+                UpdateCursor();
 
-            if (state == 1)
-            {
-                //click
+                if (state == 1)
+                {
+                    //click
+                }
             }
             
             return watching;
@@ -117,15 +119,25 @@ namespace HandGestureRecognition
             return 0;
         }*/
 
-        private int UpdateVectors(bool watching, ArrayList touchPoints)
+        private int UpdateVectors(int fingerNum, MCvPoint2D64f mvCenter)
         {
             int state = 0;
-            if (touchPoints.Count > 0)
+            if (latestPoints != null)
             {
                 //Determine average X and Y of most recent point
-                System.Drawing.Point newp = (System.Drawing.Point)touchPoints[0];
+                int avX = 0;
+                int avY = 0;
+                int pointsCount = latestPoints.Total;
+                foreach (PointF point in latestPoints)
+                {
+                    avX += (int)point.X / pointsCount;
+                    avY += (int)point.Y / pointsCount;
+                    if (Math.Abs(mvCenter.x - point.X) + Math.Abs(mvCenter.x - point.X) < 10 && mvCenter.x != 0)
+                        state = 1;
+                }
+                System.Drawing.Point newp = new System.Drawing.Point(avX, avY);
 
-
+                #region kalman processing
                 Matrix<float> prediction = kf.Predict();
                 PointF predictProint = new PointF(prediction[0, 0], prediction[1, 0]);
                 // The mouse input points.
@@ -134,20 +146,13 @@ namespace HandGestureRecognition
                 Matrix<float> estimated = kf.Correct(kfData.GetMeasurement());
                 // The resulting point from the Kalman Filter.
                 System.Drawing.Point newpEst = new System.Drawing.Point((int)estimated[0, 0], (int)estimated[1, 0]);
+                    //PointF estPoint = new PointF(estimated[0, 0], estimated[1, 0]);
                 kfData.state[0, 0] = newp.X;
                 kfData.state[1, 0] = newp.Y;
-
-                if (watching)
-                {
-                    mrKalman.X = newpEst.X - last.X;
-                    mrKalman.Y = newpEst.Y - last.Y;
-                }
-                else
-                {
-                    kf.CorrectedState = kfData.state; // stan
-                    mrKalman.X = 0;
-                    mrKalman.Y = 0;
-                }
+                
+                mrKalman.X = newpEst.X - last.X;
+                mrKalman.Y = newpEst.Y - last.Y;
+                #endregion
 
                 last = newpEst;
             }
