@@ -19,15 +19,20 @@ namespace HandGestureRecognition
         KeyboardHookListener keyboard;
         UIntPtr dwExtraInfo;
         [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
-        static extern void mouse_event(uint dwFlags, uint dx, uint dy,
-        uint dwData, UIntPtr dwExtraInfo);
+        static extern void mouse_event(int dwFlags, int dx, int dy,
+        int dwData, UIntPtr dwExtraInfo);
+
 
         private const int MOUSEEVENTF_LEFTDOWN = 0x02;
         private const int MOUSEEVENTF_LEFTUP = 0x04;
         private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
         private const int MOUSEEVENTF_RIGHTUP = 0x10;
+        private const int MOUSEEVENTF_WHEEL = 0x800;
+        private const int WHEEL_DELTA = 100;
+
         delegate void KeyHandler(object source, KeyEventArgs arg);
         bool clicking;
+        bool scrolling;
 
         Vector victor, mrKalman;
         int[,,] pointSet;
@@ -46,13 +51,14 @@ namespace HandGestureRecognition
 
         public MouseDriver()
         {
-            CURR_SEN = 6.5F;
+            CURR_SEN = 8.5F;
             vectors = new Queue<int[]>(5);
             position = new System.Drawing.Point(0, 0);
             watching = false;
             pointSet = new int[5,3,16];
             pointSetPointer = pointCount = 0;
             clicking = false;
+            scrolling = false;
 
             kfData = new SyntheticData();
             keyboard = new KeyboardHookListener(new GlobalHooker());
@@ -116,12 +122,38 @@ namespace HandGestureRecognition
 
             if (touchPoints.Count < 2 )
             {
-                clicking = false;
+                if (clicking)
+                {
+                    mouse_event(MOUSEEVENTF_LEFTUP, Cursor.Position.X, Cursor.Position.Y, 0, dwExtraInfo);
+                    clicking = false;
+                }
+            }
+            if (touchPoints.Count != 3)
+            {
+                scrolling = false;
             }
             if (touchPoints.Count == 2 && !clicking)
             {
                 clicking = true;
-                mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, (uint)Cursor.Position.X, (uint)Cursor.Position.Y, 0, dwExtraInfo);
+                mouse_event(MOUSEEVENTF_LEFTDOWN, Cursor.Position.X, Cursor.Position.Y, 0, dwExtraInfo);
+            }
+            if (touchPoints.Count == 3)
+            {
+                if (clicking)
+                {
+                    mouse_event(MOUSEEVENTF_LEFTUP, Cursor.Position.X, Cursor.Position.Y, 0, dwExtraInfo);
+                    clicking = false;
+                }
+                if (victor.Y > 0)
+                {
+                    mouse_event(MOUSEEVENTF_WHEEL, 0, 0, WHEEL_DELTA, (UIntPtr)0);
+                    scrolling = true;
+                }
+                if (victor.Y < 0)
+                {
+                    mouse_event(MOUSEEVENTF_WHEEL, 0, 0, -1 * WHEEL_DELTA, (UIntPtr)0);
+                    scrolling = true;
+                }
             }
             
             return watching;
@@ -177,7 +209,7 @@ namespace HandGestureRecognition
                 #endregion
                 System.Drawing.Point newp = (System.Drawing.Point)touchPoints[fingerToUse - 1];
 
-                if (watching && !clicking)
+                if (watching)
                 {
                     if (last.X == 0 && last.Y == 0)
                         victor.X = victor.Y = 0;
@@ -199,8 +231,10 @@ namespace HandGestureRecognition
                     System.Drawing.Point newpEst = new System.Drawing.Point((int)estimated[0, 0], (int)estimated[1, 0]);
                     mrKalman.X = newpEst.X - lastEst.X;
                     mrKalman.Y = newpEst.Y - lastEst.Y;
-
-                    UpdateCursor();
+                    if (!scrolling)
+                    {
+                        UpdateCursor();
+                    }
                     last = newp;
                     lastEst = newpEst;
                 }

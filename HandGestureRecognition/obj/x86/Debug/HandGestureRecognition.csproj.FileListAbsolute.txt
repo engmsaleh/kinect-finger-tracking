@@ -256,3 +256,6 @@ H:\Dropbox\ft2\HandGestureRecognition\obj\x86\Debug\ResGen.read.1.tlog
 H:\Dropbox\ft2\HandGestureRecognition\obj\x86\Debug\GenerateResource.write.1.tlog
 H:\Dropbox\ft2\HandGestureRecognition\obj\x86\Debug\ResGen.write.1.tlog
 H:\Dropbox\ft2\HandGestureRecognition\bin\Debug\MouseKeyboardActivityMonitor.dll
+C:\Users\Ray\Dropbox\ft2\HandGestureRecognition\bin\Debug\HandGestureRecognition.exe.config
+C:\Users\Ray\Dropbox\ft2\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.exe
+C:\Users\Ray\Dropbox\ft2\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.pdb
