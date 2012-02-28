@@ -19,33 +19,29 @@ namespace HandGestureRecognition
 
         public SyntheticData()
         {
-            state = new Matrix<float>(6, 1);
+            state = new Matrix<float>(4, 1);
             state[0, 0] = 0f; // x-pos
             state[1, 0] = 0f; // y-pos
             state[2, 0] = 0f; // x-velocity
             state[3, 0] = 0f; // y-velocity
-            state[4, 0] = 0f; // x-velocity
-            state[5, 0] = 0f; // y-velocity
             transitionMatrix = new Matrix<float>(new float[,]
                 {
-                    {1,0,1,0,0.5F,0},
-                    {0,1,0,1,0,0.5F},
-                    {0,0,1,0,1,0},
-                    {0,0,0,1,0,1},
-                    {0,0,0,0,1,0},
-                    {0,0,0,0,0,1}
+                    {1, 0, 1, 0},
+                    {0, 1, 0, 1},
+                    {0, 0, 1, 0},
+                    {0, 0, 0, 1}
                 });
             measurementMatrix = new Matrix<float>(new float[,] 
                 { 
-                    { 1,0,1,0,0.5F,0 }, 
-                    { 0,1,0,1,0,0.5F } 
+                    { 1, 0, 0, 0 }, 
+                    { 0, 1, 0, 0 } 
                 });
             measurementMatrix.SetIdentity();
-            processNoise = new Matrix<float>(6, 4);
+            processNoise = new Matrix<float>(4, 4);
             processNoise.SetIdentity(new MCvScalar(1.0e-4));
             measurementNoise = new Matrix<float>(2, 2);
             measurementNoise.SetIdentity(new MCvScalar(1e-1));
-            errorCovariancePost = new Matrix<float>(6, 4);
+            errorCovariancePost = new Matrix<float>(4, 4);
             errorCovariancePost.SetIdentity();
         }
 
