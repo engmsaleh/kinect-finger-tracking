@@ -259,3 +259,4 @@ H:\Dropbox\ft2\HandGestureRecognition\bin\Debug\MouseKeyboardActivityMonitor.dll
 C:\Users\Ray\Dropbox\ft2\HandGestureRecognition\bin\Debug\HandGestureRecognition.exe.config
 C:\Users\Ray\Dropbox\ft2\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.exe
 C:\Users\Ray\Dropbox\ft2\HandGestureRecognition\obj\x86\Debug\HandGestureRecognition.pdb
+C:\ft\HandGestureRecognition\bin\Debug\MouseKeyboardActivityMonitor.dll

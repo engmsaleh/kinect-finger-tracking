@@ -73,13 +73,9 @@ namespace HandGestureRecognition
         private void initKalman()
         {
             last = lastEst = new System.Drawing.Point();
-            kf = new Kalman(4, 2, 0);
-            kf.TransitionMatrix = kfData.transitionMatrix;
-            kf.MeasurementMatrix = kfData.measurementMatrix;
-            kf.ProcessNoiseCovariance = kfData.processNoise;
-            kf.MeasurementNoiseCovariance = kfData.measurementNoise;
+            kf = new Kalman(kfData.state,kfData.transitionMatrix, kfData.measurementMatrix, 
+                kfData.processNoise, kfData.measurementNoise);
             kf.ErrorCovariancePost = kfData.errorCovariancePost;
-            kf.CorrectedState = kfData.state; // stan
         }
 
         public MouseDriver(Seq<PointF> points, int fingerNum, ArrayList touchPoints) : this()
@@ -117,7 +113,7 @@ namespace HandGestureRecognition
                 mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, Cursor.Position.X, Cursor.Position.Y, 0, 0);                    
             }*/
 
-            int state = UpdateVectors(watching, touchPoints, touchPoints.Count);
+            int state = UpdateVectors(watching, touchPoints);
 
 
             if (touchPoints.Count < 2 )
@@ -170,7 +166,7 @@ namespace HandGestureRecognition
             return 0;
         }*/
 
-        private int UpdateVectors(bool watching, ArrayList touchPoints, int fingerToUse)
+        private int UpdateVectors(bool watching, ArrayList touchPoints)
         {
             int state = 0;
             if (touchPoints.Count > 0)
@@ -207,9 +203,26 @@ namespace HandGestureRecognition
                     }
                 }*/
                 #endregion
-                System.Drawing.Point newp = (System.Drawing.Point)touchPoints[fingerToUse - 1];
+                float distanceA = 0;
+                float distanceB = -1;
+                int fingerToUse = 0;
+                int index = 0;
+                bool stopped = false;
+                foreach(System.Drawing.Point newpoint in touchPoints) {
+                    distanceA = Math.Abs(newpoint.X - last.X) + Math.Abs(newpoint.Y - last.Y);
+                    if (distanceA < distanceB || distanceB < 0)
+                    {
+                        distanceB = distanceA;
+                        fingerToUse = index;
+                    }
+                    index++;
+                }
+                if (distanceB >= 0 && distanceB < 4)
+                    stopped = true;
 
-                if (watching)
+                System.Drawing.Point newp = (System.Drawing.Point)touchPoints[fingerToUse];
+
+                if (watching && !stopped)
                 {
                     if (last.X == 0 && last.Y == 0)
                         victor.X = victor.Y = 0;
