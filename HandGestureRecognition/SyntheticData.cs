@@ -20,8 +20,8 @@ namespace HandGestureRecognition
         public SyntheticData()
         {
             state = new Matrix<float>(4, 1);
-            state[0, 0] = Cursor.Position.X; // x-pos
-            state[1, 0] = Cursor.Position.Y; // y-pos
+            state[0, 0] = 0f; // x-pos
+            state[1, 0] = 0f; // y-pos
             state[2, 0] = 0f; // x-velocity
             state[3, 0] = 0f; // y-velocity
             transitionMatrix = new Matrix<float>(new float[,]

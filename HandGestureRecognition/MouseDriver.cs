@@ -35,7 +35,7 @@ namespace HandGestureRecognition
         int pointCount;
 
         Queue<int[]> vectors;
-        System.Drawing.Point last;
+        System.Drawing.Point last,lastEst;
         private float CURR_SEN;
         bool watching;
         Kalman kf;
@@ -54,10 +54,19 @@ namespace HandGestureRecognition
             pointSetPointer = pointCount = 0;
             clicking = false;
 
-            #region initialize Kalman filter
             kfData = new SyntheticData();
             keyboard = new KeyboardHookListener(new GlobalHooker());
+            initKalman();
 
+            victor.X = 0;
+            victor.Y = 0;
+            mrKalman.X = 0;
+            mrKalman.Y = 0;
+        }
+
+        private void initKalman()
+        {
+            last = lastEst = new System.Drawing.Point();
             kf = new Kalman(4, 2, 0);
             kf.TransitionMatrix = kfData.transitionMatrix;
             kf.MeasurementMatrix = kfData.measurementMatrix;
@@ -65,12 +74,6 @@ namespace HandGestureRecognition
             kf.MeasurementNoiseCovariance = kfData.measurementNoise;
             kf.ErrorCovariancePost = kfData.errorCovariancePost;
             kf.CorrectedState = kfData.state; // stan
-            #endregion
-
-            victor.X = 0;
-            victor.Y = 0;
-            mrKalman.X = 0;
-            mrKalman.Y = 0;
         }
 
         public MouseDriver(Seq<PointF> points, int fingerNum, ArrayList touchPoints) : this()
@@ -80,13 +83,18 @@ namespace HandGestureRecognition
 
         public bool AddFrame(Seq<PointF> points, int fingerNum, ArrayList touchPoints) 
         {
-            if (touchPoints.Count >= 1)
+            if (touchPoints.Count >= 1 && !watching)
             {
                 watching = true;
             }
-            else if (touchPoints.Count < 1)
+            else if (touchPoints.Count < 1 && watching)
             {
                 watching = false;
+                mrKalman.X = 0;
+                mrKalman.Y = 0;
+                initKalman();
+                kfData.state[0, 0] = 0;
+                kfData.state[1, 0] = 0;
             }
             /*int state = 0;
             if (movementContour != null)
@@ -171,6 +179,16 @@ namespace HandGestureRecognition
 
                 if (watching && !clicking)
                 {
+                    if (last.X == 0 && last.Y == 0)
+                        victor.X = victor.Y = 0;
+                    else
+                    {
+                        victor.X = newp.X - last.X;
+                        victor.Y = newp.Y - last.Y;
+                    }
+                    kfData.state[0, 0] = kfData.state[0, 0] + (float)victor.X;
+                    kfData.state[1, 0] = kfData.state[1, 0] + (float)victor.Y;
+
                     Matrix<float> prediction = kf.Predict();
                     PointF predictProint = new PointF(prediction[0, 0], prediction[1, 0]);
                     // The mouse input points.
@@ -179,20 +197,12 @@ namespace HandGestureRecognition
                     Matrix<float> estimated = kf.Correct(kfData.GetMeasurement());
                     // The resulting point from the Kalman Filter.
                     System.Drawing.Point newpEst = new System.Drawing.Point((int)estimated[0, 0], (int)estimated[1, 0]);
-                    kfData.state[0, 0] = newp.X;
-                    kfData.state[1, 0] = newp.Y;
+                    mrKalman.X = newpEst.X - lastEst.X;
+                    mrKalman.Y = newpEst.Y - lastEst.Y;
 
-                    mrKalman.X = newpEst.X - last.X;
-                    mrKalman.Y = newpEst.Y - last.Y;
                     UpdateCursor();
-                    last = newpEst;
-                }
-                else
-                {
-                    kf.CorrectedState = kfData.state; // stan
-                    mrKalman.X = 0;
-                    mrKalman.Y = 0;
                     last = newp;
+                    lastEst = newpEst;
                 }
 
             }
