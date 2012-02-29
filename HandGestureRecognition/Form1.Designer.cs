@@ -33,7 +33,9 @@
             this.bRecalibrate = new System.Windows.Forms.Button();
             this.testBox = new System.Windows.Forms.TextBox();
             this.mouseKeyEventProvider1 = new MouseKeyboardActivityMonitor.Controls.MouseKeyEventProvider();
+            this.threshold = new System.Windows.Forms.TrackBar();
             ((System.ComponentModel.ISupportInitialize)(this.imageBoxFrameGrabber)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.threshold)).BeginInit();
             this.SuspendLayout();
             // 
             // imageBoxFrameGrabber
@@ -75,11 +77,26 @@
             this.mouseKeyEventProvider1.Enabled = true;
             this.mouseKeyEventProvider1.HookType = MouseKeyboardActivityMonitor.Controls.HookType.Global;
             // 
+            // threshold
+            // 
+            this.threshold.LargeChange = 20;
+            this.threshold.Location = new System.Drawing.Point(671, 162);
+            this.threshold.Maximum = 180;
+            this.threshold.Minimum = 70;
+            this.threshold.Name = "threshold";
+            this.threshold.Size = new System.Drawing.Size(100, 45);
+            this.threshold.SmallChange = 10;
+            this.threshold.TabIndex = 7;
+            this.threshold.TickFrequency = 10;
+            this.threshold.Value = 100;
+            this.threshold.Scroll += new System.EventHandler(this.trackBar1_Scroll);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(810, 538);
+            this.Controls.Add(this.threshold);
             this.Controls.Add(this.testBox);
             this.Controls.Add(this.bRecalibrate);
             this.Controls.Add(this.dataOutput);
@@ -87,6 +104,7 @@
             this.Name = "Form1";
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.imageBoxFrameGrabber)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.threshold)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -99,6 +117,7 @@
         private System.Windows.Forms.Button bRecalibrate;
         private System.Windows.Forms.TextBox testBox;
         private MouseKeyboardActivityMonitor.Controls.MouseKeyEventProvider mouseKeyEventProvider1;
+        private System.Windows.Forms.TrackBar threshold;
 
     }
 }

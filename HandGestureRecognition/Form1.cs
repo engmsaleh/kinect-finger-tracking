@@ -138,7 +138,7 @@ namespace HandGestureRecognition
                                 temp = 0;
                             else
                                 temp = MAX_INT32;
-                            if (d <= 0 || Math.Abs(tableTemp) < 40 || d < tableData[i] - thickness || d > 6000)
+                            if (d <= 0 || Math.Abs(tableTemp) < 50 || d < tableData[i] - thickness || d > 6000)
                                 moveData[thisY, thisX-80, 0] = 0;
                             else
                                 moveData[thisY, thisX-80, 0] = 255;
@@ -168,11 +168,11 @@ namespace HandGestureRecognition
         {
             using (MemStorage storage = new MemStorage())
             {
-                Contour<Point> contours = input.FindContours(Emgu.CV.CvEnum.CHAIN_APPROX_METHOD.CV_CHAIN_APPROX_SIMPLE, Emgu.CV.CvEnum.RETR_TYPE.CV_RETR_LIST, storage);
-                Contour<Point> biggestContour = null;
-
                 Double Result1 = 0;
                 Double Result2 = 0;
+                /*Contour<Point> contours = input.FindContours(Emgu.CV.CvEnum.CHAIN_APPROX_METHOD.CV_CHAIN_APPROX_SIMPLE, Emgu.CV.CvEnum.RETR_TYPE.CV_RETR_LIST, storage);
+                Contour<Point> biggestContour = null;
+
                 while (contours != null)
                 {
                     Result1 = contours.Area;
@@ -182,7 +182,7 @@ namespace HandGestureRecognition
                         biggestContour = contours;
                     }
                     contours = contours.HNext;
-                }
+                }*/
 
                 Contour<Point> mvContours = movement.FindContours(Emgu.CV.CvEnum.CHAIN_APPROX_METHOD.CV_CHAIN_APPROX_SIMPLE, Emgu.CV.CvEnum.RETR_TYPE.CV_RETR_LIST, storage);
                 Contour<Point> biggestMovement = null;
@@ -203,7 +203,7 @@ namespace HandGestureRecognition
                 }
                 mvContours = null;
 
-                if (biggestContour != null)
+                /*if (biggestContour != null)
                 {
                     Contour<Point> currentContour = biggestContour.ApproxPoly(biggestContour.Perimeter * 0.0025, storage);
                     currentFrame.Draw(currentContour, new Gray(MAX_INT32), 2);
@@ -268,7 +268,8 @@ namespace HandGestureRecognition
                     return true;
                 }
                 else
-                    return false;
+                    return false;*/
+                return true;
             }
         }
 
@@ -283,6 +284,7 @@ namespace HandGestureRecognition
             int fingerNum = 0;
 
             #region defects drawing
+            /*
             if (defects != null)
             {
                 for (int i = 0; i < defects.Total; i++)
@@ -330,22 +332,27 @@ namespace HandGestureRecognition
                     CircleF circEnd = new CircleF(realend, 5f);
                     colorFrame.Draw(circEnd, new Bgr(Color.Yellow), 2);
                 }
-            }
+            }*/
             #endregion
 
-            if (mouse.AddFrame(realendPointList, fingerNum, touchPoints)) 
+            if (mouse.AddFrame(/*realendPointList, */fingerNum, touchPoints)) 
                 dataOutput.Text = "watching";
             else
                 dataOutput.Text = "not watching";
-            testBox.Text = touchPoints.Count.ToString();
 
             MCvFont font = new MCvFont(Emgu.CV.CvEnum.FONT.CV_FONT_HERSHEY_DUPLEX, 5d, 5d);
-            colorFrame.Draw(fingerNum.ToString(), ref font, new Point(50, 150), new Bgr(255, 10, 10));
+            //colorFrame.Draw(fingerNum.ToString(), ref font, new Point(50, 150), new Bgr(255, 10, 10));
+            colorFrame.Draw(touchPoints.Count.ToString(), ref font, new Point(50, 150), new Bgr(255, 10, 10));
         }
 
         private void bRecalibrate_Click(object sender, EventArgs e)
         {
             recalibrate = true;
+        }
+
+        private void trackBar1_Scroll(object sender, EventArgs e)
+        {
+            thickness = threshold.Value;
         }
     }
 }

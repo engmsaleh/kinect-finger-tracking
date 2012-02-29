@@ -29,34 +29,21 @@ namespace HandGestureRecognition
         private const int MOUSEEVENTF_RIGHTUP = 0x10;
         private const int MOUSEEVENTF_WHEEL = 0x800;
         private const int WHEEL_DELTA = 100;
+        private const float CURR_SEN = 6.5F;
 
         delegate void KeyHandler(object source, KeyEventArgs arg);
         bool clicking;
         bool scrolling;
+        bool watching;
 
         Vector victor, mrKalman;
-        int[,,] pointSet;
-        int pointSetPointer;
-        int pointCount;
-
-        Queue<int[]> vectors;
         System.Drawing.Point last,lastEst;
-        private float CURR_SEN;
-        bool watching;
         Kalman kf;
         SyntheticData kfData;
-        
-        //Cursor Variables
-        System.Drawing.Point position;
 
         public MouseDriver()
         {
-            CURR_SEN = 8.5F;
-            vectors = new Queue<int[]>(5);
-            position = new System.Drawing.Point(0, 0);
             watching = false;
-            pointSet = new int[5,3,16];
-            pointSetPointer = pointCount = 0;
             clicking = false;
             scrolling = false;
 
@@ -78,12 +65,12 @@ namespace HandGestureRecognition
             kf.ErrorCovariancePost = kfData.errorCovariancePost;
         }
 
-        public MouseDriver(Seq<PointF> points, int fingerNum, ArrayList touchPoints) : this()
+        public MouseDriver(/*Seq<PointF> points, */int fingerNum, ArrayList touchPoints) : this()
         {
-            AddFrame(points, fingerNum, touchPoints);
+            AddFrame(/*points, */fingerNum, touchPoints);
         }
 
-        public bool AddFrame(Seq<PointF> points, int fingerNum, ArrayList touchPoints) 
+        public bool AddFrame(/*Seq<PointF> points, */int fingerNum, ArrayList touchPoints) 
         {
             if (touchPoints.Count >= 1 && !watching)
             {
@@ -94,27 +81,11 @@ namespace HandGestureRecognition
                 watching = false;
                 mrKalman.X = 0;
                 mrKalman.Y = 0;
+                kfData.state.SetValue(0);
                 initKalman();
-                kfData.state[0, 0] = 0;
-                kfData.state[1, 0] = 0;
             }
-            /*int state = 0;
-            if (movementContour != null)
-            {
-                MCvMoments mvMoments = movementContour.GetMoments();
-                MCvPoint2D64f mvCenter = mvMoments.GravityCenter;
-                state = UpdateVectors(fingerNum, mvCenter);
-            }
-            else
-                UpdateVectors(fingerNum, new MCvPoint2D64f());
-            UpdateCursor();
-            if (state == 1)
-            {
-                mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, Cursor.Position.X, Cursor.Position.Y, 0, 0);                    
-            }*/
 
             int state = UpdateVectors(watching, touchPoints);
-
 
             if (touchPoints.Count < 2 )
             {
@@ -208,17 +179,19 @@ namespace HandGestureRecognition
                 int fingerToUse = 0;
                 int index = 0;
                 bool stopped = false;
-                foreach(System.Drawing.Point newpoint in touchPoints) {
-                    distanceA = Math.Abs(newpoint.X - last.X) + Math.Abs(newpoint.Y - last.Y);
-                    if (distanceA < distanceB || distanceB < 0)
+                if (touchPoints.Count > 1)
+                    foreach (System.Drawing.Point newpoint in touchPoints)
                     {
-                        distanceB = distanceA;
-                        fingerToUse = index;
+                        distanceA = Math.Abs(newpoint.X - last.X) + Math.Abs(newpoint.Y - last.Y);
+                        if (distanceA < distanceB || distanceB < 0)
+                        {
+                            distanceB = distanceA;
+                            fingerToUse = index;
+                        }
+                        index++;
                     }
-                    index++;
-                }
-                if (distanceB >= 0 && distanceB < 4)
-                    stopped = true;
+                else
+                    fingerToUse = 0;
 
                 System.Drawing.Point newp = (System.Drawing.Point)touchPoints[fingerToUse];
 
@@ -258,7 +231,7 @@ namespace HandGestureRecognition
 
         private void UpdateCursor()
         {
-            position = Cursor.Position;
+            System.Drawing.Point position = Cursor.Position;
             position.Offset((int)((mrKalman.X) * CURR_SEN), (int)((mrKalman.Y) * CURR_SEN * -1));
             Cursor.Position = position;
             kfData.GoToNextState();
